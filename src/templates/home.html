@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Solar Battery Monitoring System</title>
+{% extends "base.html" %}
+
+{% block title %}Home - Solar Battery Monitor{% endblock %}
+
+{% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+{% endblock %}
+
+{% block content %}
+    <!-- <h1>Welcome to the Home Page</h1> -->
     <script>
         function sendDeviceInfo(deviceName) {
             fetch('/device-click', {
@@ -23,21 +26,22 @@
             });
         }
     </script>
-</head>
-<body>
-    <header>
-        <h1>Solar Battery Monitoring System</h1>
-    </header>
     <main>
-        <h2>Devices</h2>
-        <ul>
-            {% for device in devices %}
-                <li><a href="devices" target="_blank" onclick="sendDeviceInfo('{{ device.name }}')">{{ device.name }}</a> - Status: {{ device.status }} - IP: {{ device.ip }}</li>
-            {% endfor %}
-        </ul>
+        <h2 class="devices">Devices Lists</h2>
+        <div class="device_list">
+            <ul >
+                {% for device in devices %}
+                    <li>
+                        <button> <a href="device/ " onclick="sendDeviceInfo('{{ device.name }}')"> {{ device.name }}  </a>
+                        </button>
+                        <span>   Status: {{ device.status }} - IP: {{ device.ip }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
     </main>
     <footer>
         <p>&copy; 2023 Kannur Solar Battery Monitoring System</p>
     </footer>
-</body>
-</html>
+{% endblock %}

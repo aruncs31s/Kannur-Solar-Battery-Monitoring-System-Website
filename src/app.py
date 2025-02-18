@@ -4,29 +4,15 @@ import sqlite3
 from datetime import datetime
 import requests
 import csv
+from database import Database
+
+db = Database()
+
 
 app = Flask(__name__)
 
 ESP8266_IP = ""  
 ESP8266_PORT = 80 
-
-
-def init_db():
-    conn = sqlite3.connect('sensor_data.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS sensor_readings
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  temperature REAL,
-                  humidity REAL,
-                  light_sensor_value REAL,
-                  battery_voltage REAL,
-                  led_relay_state TEXT,
-                  rain_volume REAL,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
-    conn.commit()
-    conn.close()
-
-init_db()
 
 
 @app.route('/api/control', methods=['POST'])
@@ -73,26 +59,22 @@ def devices_page():
 def receive_data():
     try:
         data = request.get_json()
+        print(f"Received data: {data}")
         
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
         
         c.execute('''INSERT INTO sensor_readings 
-                    (temperature, humidity, light_sensor_value, 
-                     battery_voltage, led_relay_state, rain_volume)
-                    VALUES (?, ?, ?, ?, ?, ?)''',
-                    (data.get('temperature'),
-                     data.get('humidity'),
-                     data.get('light_sensor_value'),
-                     data.get('battery_voltage'),
-                     data.get('led_relayState'),
-                     data.get('rain_volume')))
+                    (battery_voltage)
+                    VALUES (?)''',
+                    (data.get('battery_voltage'),))
         conn.commit()
         conn.close()
         
         return jsonify({"status": "success"}), 200
     
     except Exception as e:
+        print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/data', methods=['GET'])
@@ -123,13 +105,8 @@ def get_data():
         for row in rows:
             data.append({
                 'id': row[0],
-                'temperature': row[1],
-                'humidity': row[2],
-                'light_sensor_value': row[3],
-                'battery_voltage': row[4],
-                'led_relay_state': row[5],
-                'rain_volume': row[6],
-                'timestamp': row[7]
+                'battery_voltage': row[1],
+                'timestamp': row[2]
             })
         
         return jsonify(data), 200
@@ -156,6 +133,58 @@ def get_devices():
         for row in reader:
             devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
     return jsonify(devices), 200
+
+@app.route('/api/measurements', methods=['POST'])
+def receive_measurements():
+    try:
+        data = request.get_json()
+        print(f"Received measurements: {data}")
+        device_id = data.get('device_id')
+        measurements = data.get('measurements')  # List of measurements
+        
+        conn = sqlite3.connect('sensor_data.db')
+        c = conn.cursor()
+        
+        for measurement in measurements:
+            c.execute('''INSERT INTO measurements 
+                        (device_id, parameter1, parameter2, parameter3)
+                        VALUES (?, ?, ?, ?)''',
+                        (device_id, measurement['parameter1'], measurement['parameter2'], measurement['parameter3']))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"status": "success"}), 200
+    
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/measurements/<int:device_id>', methods=['GET'])
+def get_measurements(device_id):
+    try:
+        conn = sqlite3.connect('sensor_data.db')
+        c = conn.cursor()
+        
+        c.execute('''SELECT parameter1, parameter2, parameter3, timestamp FROM measurements 
+                     WHERE device_id = ? ORDER BY timestamp DESC''', (device_id,))
+        
+        rows = c.fetchall()
+        conn.close()
+        
+        measurements = []
+        for row in rows:
+            measurements.append({
+                'parameter1': row[0],
+                'parameter2': row[1],
+                'parameter3': row[2],
+                'timestamp': row[3]
+            })
+        
+        return jsonify(measurements), 200
+    
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

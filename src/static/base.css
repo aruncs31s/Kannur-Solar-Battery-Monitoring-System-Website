@@ -1,4 +1,4 @@
-/*  Nord Theme Colors */
+/* Nord Theme Colors */
 :root {
     --nord0: #2E3440;
     --nord1: #3B4252;
@@ -17,8 +17,6 @@
     --nord14: #A3BE8C;
     --nord15: #B48EAD;
 }
-/*
-
 
 body {
     background-color: var(--nord0);
@@ -38,6 +36,8 @@ header {
 
 h1 {
     text-align: center;
+    text-shadow: var(--nord0) 10px 10px;
+    
 }
 
 a {
@@ -50,13 +50,6 @@ a:hover {
     text-decoration: underline;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
 
 li {
     background-color: var(--nord2);
@@ -76,23 +69,32 @@ footer {
     position: fixed;
     width: 100%;
     bottom: 0;
-} */
-ul {
+}
+nav {
+    background-color: var(--nord1);
+    overflow: hidden;
+}
+
+nav ul {
     list-style-type: none;
+    margin: 0;
     padding: 0;
-    
-}
-/* NOTE: This is applicable for all the butttons  */
-button{
-    background-color: var(--nord2);
 }
 
-.devices{
-    text-align: left;
-    padding-left: 10rem;
+nav .nav_links {
+    display: flex;
+    justify-content: space-around;
 }
 
-.device_list{
-    position: center;
-    ;
+nav a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    background-color: #ddd;
+    color: black;
 }
