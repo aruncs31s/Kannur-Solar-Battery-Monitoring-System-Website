@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, render_template
 import sqlite3
 from datetime import datetime
 import requests
+import csv
 
 app = Flask(__name__)
 
@@ -51,7 +52,22 @@ def control_esp():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    devices = []
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        print("hi")
+        for row in reader:
+            devices.append({'name': row['Assigned_Place'], 'status': row['Status'] , 'ip': row['IP']})
+    return render_template('home.html', devices=devices)
+
+@app.route('/devices', methods=['GET'])
+def devices_page():
+    devices = []
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+    return render_template('devices.html', devices=devices)
 
 @app.route('/api/data', methods=['POST'])
 def receive_data():
@@ -71,7 +87,6 @@ def receive_data():
                      data.get('battery_voltage'),
                      data.get('led_relayState'),
                      data.get('rain_volume')))
-        
         conn.commit()
         conn.close()
         
@@ -121,6 +136,26 @@ def get_data():
     
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/device-click', methods=['POST'])
+def device_click():
+    try:
+        data = request.get_json()
+        device_name = data.get('name')
+        # Handle the device click information here
+        print(f"Device clicked: {device_name}")
+        return jsonify({"status": "success", "device": device_name}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/devices', methods=['GET'])
+def get_devices():
+    devices = []
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+    return jsonify(devices), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
