@@ -1,32 +1,5 @@
-/*  Nord Theme Colors */
-:root {
-    --nord0: #2E3440;
-    --nord1: #3B4252;
-    --nord2: #434C5E;
-    --nord3: #4C566A;
-    --nord4: #D8DEE9;
-    --nord5: #E5E9F0;
-    --nord6: #ECEFF4;
-    --nord7: #8FBCBB;
-    --nord8: #88C0D0;
-    --nord9: #81A1C1;
-    --nord10: #5E81AC;
-    --nord11: #BF616A;
-    --nord12: #D08770;
-    --nord13: #EBCB8B;
-    --nord14: #A3BE8C;
-    --nord15: #B48EAD;
-}
-/*
-
-
-body {
-    background-color: var(--nord0);
-    color: var(--nord4);
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
+/* Nord Theme Colors */
+@import './base.css';
 
 header {
     background-color: var(--nord1);
@@ -76,23 +49,17 @@ footer {
     position: fixed;
     width: 100%;
     bottom: 0;
-} */
-ul {
-    list-style-type: none;
-    padding: 0;
-    
 }
-/* NOTE: This is applicable for all the butttons  */
-button{
+
+button {
     background-color: var(--nord2);
 }
 
-.devices{
+.devices {
     text-align: left;
     padding-left: 10rem;
 }
 
-.device_list{
+.device_list {
     position: center;
-    ;
 }

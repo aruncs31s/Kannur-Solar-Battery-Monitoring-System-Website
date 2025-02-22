@@ -1,18 +1,21 @@
 # app.py
 from flask import Flask, request, jsonify, render_template
 import sqlite3
-from datetime import datetime
-import requests
 import csv
 from database import Database
 
 db = Database()
-
-
 app = Flask(__name__)
+ESP8266_PORT = 80
 
-ESP8266_IP = ""  
-ESP8266_PORT = 80 
+@app.route('/')
+def home():
+    devices = []
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+    return render_template('home.html', devices=devices)
 
 
 @app.route('/api/control', methods=['POST'])
@@ -20,31 +23,17 @@ def control_esp():
     try:
         data = request.get_json()
         state = data.get('state', False)
-        
-        # Send command to ESP8266
         esp_url = f"http://{ESP8266_IP}:{ESP8266_PORT}/control"
         response = requests.post(esp_url, json={'state': state}, timeout=5)
-        
         if response.status_code == 200:
             return jsonify({"status": "success", "state": state}), 200
         else:
             return jsonify({"status": "error", "message": "Failed to communicate with ESP8266"}), 500
-            
     except requests.exceptions.RequestException as e:
         return jsonify({"status": "error", "message": f"Connection error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
-@app.route('/')
-def home():
-    devices = []
-    with open('devices.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        print("hi")
-        for row in reader:
-            devices.append({'name': row['Assigned_Place'], 'status': row['Status'] , 'ip': row['IP']})
-    return render_template('home.html', devices=devices)
 
 @app.route('/devices', methods=['GET'])
 def devices_page():
@@ -59,32 +48,21 @@ def devices_page():
 def receive_data():
     try:
         data = request.get_json()
-        print(f"Received data: {data}")
-        
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
-        
-        c.execute('''INSERT INTO sensor_readings 
-                    (battery_voltage)
-                    VALUES (?)''',
-                    (data.get('battery_voltage'),))
+        c.execute('''INSERT INTO sensor_readings (battery_voltage) VALUES (?)''', (data.get('battery_voltage'),))
         conn.commit()
         conn.close()
-        
         return jsonify({"status": "success"}), 200
-    
     except Exception as e:
-        print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/data', methods=['GET'])
 def get_data():
     try:
         timeframe = request.args.get('timeframe', 'hour')
-        
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
-        
         if timeframe == 'hour':
             time_constraint = "datetime('now', '-1 hour')"
         elif timeframe == 'day':
@@ -93,24 +71,11 @@ def get_data():
             time_constraint = "datetime('now', '-7 days')"
         else:
             time_constraint = "datetime('now', '-1 hour')"
-        
-        c.execute(f'''SELECT * FROM sensor_readings 
-                     WHERE timestamp > {time_constraint}
-                     ORDER BY timestamp DESC''')
-        
+        c.execute(f'''SELECT * FROM sensor_readings WHERE timestamp > {time_constraint} ORDER BY timestamp DESC''')
         rows = c.fetchall()
         conn.close()
-        
-        data = []
-        for row in rows:
-            data.append({
-                'id': row[0],
-                'battery_voltage': row[1],
-                'timestamp': row[2]
-            })
-        
+        data = [{'id': row[0], 'battery_voltage': row[1], 'timestamp': row[2]} for row in rows]
         return jsonify(data), 200
-    
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -119,8 +84,6 @@ def device_click():
     try:
         data = request.get_json()
         device_name = data.get('name')
-        # Handle the device click information here
-        print(f"Device clicked: {device_name}")
         return jsonify({"status": "success", "device": device_name}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -138,26 +101,17 @@ def get_devices():
 def receive_measurements():
     try:
         data = request.get_json()
-        print(f"Received measurements: {data}")
         device_id = data.get('device_id')
-        measurements = data.get('measurements')  # List of measurements
-        
+        measurements = data.get('measurements')
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
-        
         for measurement in measurements:
-            c.execute('''INSERT INTO measurements 
-                        (device_id, parameter1, parameter2, parameter3)
-                        VALUES (?, ?, ?, ?)''',
-                        (device_id, measurement['parameter1'], measurement['parameter2'], measurement['parameter3']))
-        
+            c.execute('''INSERT INTO measurements (device_id, parameter1, parameter2, parameter3) VALUES (?, ?, ?, ?)''',
+                      (device_id, measurement['parameter1'], measurement['parameter2'], measurement['parameter3']))
         conn.commit()
         conn.close()
-        
         return jsonify({"status": "success"}), 200
-    
     except Exception as e:
-        print(f"Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/api/measurements/<int:device_id>', methods=['GET'])
@@ -165,26 +119,18 @@ def get_measurements(device_id):
     try:
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
-        
-        c.execute('''SELECT parameter1, parameter2, parameter3, timestamp FROM measurements 
-                     WHERE device_id = ? ORDER BY timestamp DESC''', (device_id,))
-        
+        c.execute('''SELECT parameter1, parameter2, parameter3, timestamp FROM measurements WHERE device_id = ? ORDER BY timestamp DESC''', (device_id,))
         rows = c.fetchall()
         conn.close()
-        
-        measurements = []
-        for row in rows:
-            measurements.append({
-                'parameter1': row[0],
-                'parameter2': row[1],
-                'parameter3': row[2],
-                'timestamp': row[3]
-            })
-        
+        measurements = [{'parameter1': row[0], 'parameter2': row[1], 'parameter3': row[2], 'timestamp': row[3]} for row in rows]
         return jsonify(measurements), 200
-    
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/device/<device_name>', methods=['GET'])
+def device_page(device_name):
+    # Fetch device-specific data if needed
+    return render_template('device.html', device_name=device_name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

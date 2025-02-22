@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block content %}
-    <!-- <h1>Welcome to the Home Page</h1> -->
     <script>
         function sendDeviceInfo(deviceName) {
             fetch('/device-click', {
@@ -20,6 +19,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                window.location.href = `/device/${deviceName}`;
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -29,17 +29,15 @@
     <main>
         <h2 class="devices">Devices Lists</h2>
         <div class="device_list">
-            <ul >
+            <ul>
                 {% for device in devices %}
                     <li>
-                        <button> <a href="device/ " onclick="sendDeviceInfo('{{ device.name }}')"> {{ device.name }}  </a>
-                        </button>
-                        <span>   Status: {{ device.status }} - IP: {{ device.ip }}</span>
+                        <button onclick="sendDeviceInfo('{{ device.name }}')">{{ device.name }}</button>
+                        <span>Status: {{ device.status }} - IP: {{ device.ip }}</span>
                     </li>
                 {% endfor %}
             </ul>
         </div>
-        
     </main>
     <footer>
         <p>&copy; 2023 Kannur Solar Battery Monitoring System</p>

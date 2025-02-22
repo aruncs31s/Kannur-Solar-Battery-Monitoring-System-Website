@@ -37,7 +37,6 @@ header {
 h1 {
     text-align: center;
     text-shadow: var(--nord0) 10px 10px;
-    
 }
 
 a {
@@ -49,7 +48,6 @@ a:hover {
     color: var(--nord9);
     text-decoration: underline;
 }
-
 
 li {
     background-color: var(--nord2);
@@ -70,6 +68,7 @@ footer {
     width: 100%;
     bottom: 0;
 }
+
 nav {
     background-color: var(--nord1);
     overflow: hidden;
@@ -98,3 +97,8 @@ nav a:hover {
     background-color: #ddd;
     color: black;
 }
+
+button {
+    background-color: var(--nord2);
+}
+    
