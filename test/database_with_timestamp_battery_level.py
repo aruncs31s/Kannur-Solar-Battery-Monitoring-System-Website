@@ -3,7 +3,7 @@ import sqlite3
 from datetime import datetime
 
 # Create a connection to the SQLite3 database
-conn = sqlite3.connect(os.getcwd() + "battery_level.db")
+conn = sqlite3.connect(os.getcwd() + "/battery_level.db")
 cursor = conn.cursor()
 
 cursor.execute(
