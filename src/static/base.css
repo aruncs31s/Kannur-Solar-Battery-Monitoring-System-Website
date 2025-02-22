@@ -1,104 +1,103 @@
 /* Nord Theme Colors */
 :root {
-    --nord0: #2E3440;
-    --nord1: #3B4252;
-    --nord2: #434C5E;
-    --nord3: #4C566A;
-    --nord4: #D8DEE9;
-    --nord5: #E5E9F0;
-    --nord6: #ECEFF4;
-    --nord7: #8FBCBB;
-    --nord8: #88C0D0;
-    --nord9: #81A1C1;
-    --nord10: #5E81AC;
-    --nord11: #BF616A;
-    --nord12: #D08770;
-    --nord13: #EBCB8B;
-    --nord14: #A3BE8C;
-    --nord15: #B48EAD;
+  --nord0: #2e3440;
+  --nord1: #3b4252;
+  --nord2: #434c5e;
+  --nord3: #4c566a;
+  --nord4: #d8dee9;
+  --nord5: #e5e9f0;
+  --nord6: #eceff4;
+  --nord7: #8fbcbb;
+  --nord8: #88c0d0;
+  --nord9: #81a1c1;
+  --nord10: #5e81ac;
+  --nord11: #bf616a;
+  --nord12: #d08770;
+  --nord13: #ebcb8b;
+  --nord14: #a3be8c;
+  --nord15: #b48ead;
 }
 
 body {
-    background-color: var(--nord0);
-    color: var(--nord4);
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+  background-color: var(--nord0);
+  color: var(--nord4);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 header {
-    background-color: var(--nord1);
-    color: var(--nord6);
-    padding: 20px 0;
-    text-align: center;
-    font-size: 24px;
+  background-color: var(--nord1);
+  color: var(--nord6);
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 22px;
 }
 
 h1 {
-    text-align: center;
-    text-shadow: var(--nord0) 10px 10px;
+  text-align: center;
+  text-shadow: var(--nord0) 10px 10px;
 }
 
 a {
-    color: var(--nord8);
-    text-decoration: none;
+  color: var(--nord8);
+  text-decoration: none;
 }
 
 a:hover {
-    color: var(--nord9);
-    text-decoration: underline;
+  color: var(--nord9);
+  text-decoration: underline;
 }
 
 li {
-    background-color: var(--nord2);
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    max-width: 600px;
-    width: 100%;
-    box-sizing: border-box;
+  background-color: var(--nord2);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 footer {
-    background-color: var(--nord1);
-    color: var(--nord4);
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
+  background-color: var(--nord1);
+  color: var(--nord4);
+  text-align: center;
+  padding: 10px 0;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
 }
 
 nav {
-    background-color: var(--nord1);
-    overflow: hidden;
+  background-color: var(--nord1);
+  overflow: hidden;
 }
 
 nav ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 
 nav .nav_links {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
 nav a {
-    display: block;
-    color: white;
-    text-align: center;
-    padding: 14px 20px;
-    text-decoration: none;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 20px;
+  text-decoration: none;
 }
 
 nav a:hover {
-    background-color: #ddd;
-    color: black;
+  background-color: #ddd;
+  color: black;
 }
 
 button {
-    background-color: var(--nord2);
+  background-color: var(--nord2);
 }
-    

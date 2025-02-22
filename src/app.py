@@ -15,7 +15,11 @@ def home():
         reader = csv.DictReader(csvfile)
         for row in reader:
             devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
-    return render_template('home.html', devices=devices)
+    # Sort devices by status
+    active_devices = [device for device in devices if device['status'].lower() == 'active']
+    inactive_devices = [device for device in devices if device['status'].lower() == 'inactive']
+    sorted_devices = active_devices + inactive_devices
+    return render_template('home.html', devices=sorted_devices)
 
 
 @app.route('/api/control', methods=['POST'])
@@ -131,6 +135,17 @@ def get_measurements(device_id):
 def device_page(device_name):
     # Fetch device-specific data if needed
     return render_template('device.html', device_name=device_name)
+
+@app.route('/api/search', methods=['GET'])
+def search_devices():
+    query = request.args.get('query', '').lower()
+    devices = []
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if query in row['Assigned_Place'].lower():
+                devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+    return jsonify(devices), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

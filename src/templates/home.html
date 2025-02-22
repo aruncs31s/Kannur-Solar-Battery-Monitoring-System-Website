@@ -3,43 +3,31 @@
 {% block title %}Home - Solar Battery Monitor{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css')}}">
 {% endblock %}
 
 {% block content %}
-    <script>
-        function sendDeviceInfo(deviceName) {
-            fetch('/device-click', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: deviceName })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                window.location.href = `/device/${deviceName}`;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-    </script>
-    <main>
+    <!-- <main> -->
         <h2 class="devices">Devices Lists</h2>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search devices by Place">
+            <button onclick="searchDevices()" class="search-button"style="margin-left: .3rem;">Search</button>
+            <button onclick="sortDevices()" style="margin-left: 2rem;">Sort by Status</button>
+        </div>
         <div class="device_list">
-            <ul>
+            <ul id="device-list">
                 {% for device in devices %}
-                    <li>
-                        <button onclick="sendDeviceInfo('{{ device.name }}')">{{ device.name }}</button>
-                        <span>Status: {{ device.status }} - IP: {{ device.ip }}</span>
+                    <li class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}">
+                        <div>
+                            <button onclick="sendDeviceInfo('{{ device.name }}')">{{ device.name }}</button>
+                        </div>
+                        <div>
+                            <span>Status: {{ device.status }} - IP: {{ device.ip }}</span>
+                        </div>
                     </li>
                 {% endfor %}
             </ul>
         </div>
-    </main>
-    <footer>
-        <p>&copy; 2023 Kannur Solar Battery Monitoring System</p>
-    </footer>
+    <!-- </main> -->
+    <script src="{{ url_for('static', filename='home.js') }}"></script>
 {% endblock %}
