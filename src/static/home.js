@@ -2,10 +2,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('search-input').addEventListener('input', searchDevices);
     document.querySelector('.search-bar button:nth-child(2)').addEventListener('click', sortDevices);
 });
-// Make the ? first
+
 let sortAscending = true;
 
 function sendDeviceInfo(deviceName) {
+    console.log(deviceName);
     fetch('/device-click', {
         method: 'POST',
         headers: {
@@ -38,21 +39,25 @@ function sortDevices() {
 }
 
 function searchDevices() {
-    const query = document.getElementById('search-input').value;
+    const query = document.getElementById('search-input').value.toLowerCase();
     fetch(`/api/search?query=${query}`)
         .then(response => response.json())
-        .then(data => {
+        .then(devices => {
             const deviceList = document.getElementById('device-list');
             deviceList.innerHTML = '';
-            data.forEach(device => {
+            devices.forEach(device => {
                 const li = document.createElement('li');
-                li.innerHTML = `<button onclick="sendDeviceInfo('${device.name}')">${device.name}</button>
-                            <span>Status: ${device.status} - IP: ${device.ip}</span>`;
+                li.className = device.status.toLowerCase() === 'active' ? 'active-device' : 'inactive-device';
+                li.innerHTML = `
+                    <div>
+                        <a href="/device/${device.assigned_place}" class="button-link" onclick="sendDeviceInfo('${device.assigned_place}')"> ${device.assigned_place}</a>
+                    </div>
+                    <div>
+                        <span>Status: ${device.status} - IP: ${device.ip}</span>
+                    </div>
+                `;
                 deviceList.appendChild(li);
             });
-            sortDevices();
         })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        .catch(error => console.error('Error fetching devices:', error));
 }

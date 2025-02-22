@@ -6,6 +6,7 @@ from database import Database
 
 db = Database()
 app = Flask(__name__)
+ESP8266_IP = "192.168.58.43"
 ESP8266_PORT = 80
 
 @app.route('/')
@@ -14,13 +15,45 @@ def home():
     with open('devices.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+            devices.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
     # Sort devices by status
     active_devices = [device for device in devices if device['status'].lower() == 'active']
     inactive_devices = [device for device in devices if device['status'].lower() == 'inactive']
     sorted_devices = active_devices + inactive_devices
     return render_template('home.html', devices=sorted_devices)
 
+@app.route('/device/<theDevice>', methods=['GET'])
+def devices_page(theDevice):
+    device_name = theDevice
+    total_devices = []
+    nearby_devices = []
+    devices_under_main_node = []
+    main_node = ''
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Assigned_Place'] == device_name:
+                main_node = row['Main_Node']
+                break
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Nearby_Nodes'] == device_name:
+                nearby_devices.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP'], 'main_node': row['Main_Node'], 'nearby_nodes': row['Nearby_Nodes']})
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Main_Node'] == main_node:
+                devices_under_main_node.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP'], 'main_node': row['Main_Node'], 'nearby_nodes': row['Nearby_Nodes']})
+    total_devices = nearby_devices + devices_under_main_node
+    current_device = []
+    # Check if this is absolutely necessary
+    with open('devices.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['Assigned_Place'] == theDevice:
+                current_device.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP'], 'main_node': row['Main_Node'], 'nearby_nodes': row['Nearby_Nodes']})
+    return render_template('device.html', nearby_devices=nearby_devices, devices_under_main_node=devices_under_main_node, device_name=device_name, total_devices=total_devices,current_device=current_device)
 
 @app.route('/api/control', methods=['POST'])
 def control_esp():
@@ -37,16 +70,6 @@ def control_esp():
         return jsonify({"status": "error", "message": f"Connection error: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
-
-@app.route('/devices', methods=['GET'])
-def devices_page():
-    devices = []
-    with open('devices.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
-    return render_template('devices.html', devices=devices)
 
 @app.route('/api/data', methods=['POST'])
 def receive_data():
@@ -98,7 +121,7 @@ def get_devices():
     with open('devices.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+            devices.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
     return jsonify(devices), 200
 
 @app.route('/api/measurements', methods=['POST'])
@@ -144,7 +167,7 @@ def search_devices():
         reader = csv.DictReader(csvfile)
         for row in reader:
             if query in row['Assigned_Place'].lower():
-                devices.append({'name': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
+                devices.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP']})
     return jsonify(devices), 200
 
 if __name__ == '__main__':

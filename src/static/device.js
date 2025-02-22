@@ -1,15 +1,16 @@
 function createChart(containerId, title, yAxisTitle, seriesName) {
     return Highcharts.chart(containerId, {
-        color: {
-linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-stops: [
-[0, '#003399'],
-[1, '#3366AA']
-]
-}, 
+        // color: {
+            
+        //     linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+        //     stops: [
+        //     [  0, '#003399'],
+        //             [1, '#3366AA']
+        //                 ]
+        //     }, 
         chart: {
-            type: 'line',
-            backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--nord0')
+            backgroundColor: '#3b4252',
+            type: 'line'
         },
         title: {
             text: title,
