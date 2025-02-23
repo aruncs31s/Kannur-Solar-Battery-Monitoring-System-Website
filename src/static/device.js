@@ -55,25 +55,31 @@ function createChart(containerId, title, yAxisTitle, seriesName) {
 }
 
 // Create a chart 
-const battery = createChart('chart-battery', 'Battery Voltage Over Time', 'Voltage (V)', 'Battery Voltage');
+const charts = {
+    battery: createChart('chart-battery', 'Battery Voltage Over Time', 'Voltage (V)', 'Battery Voltage')
+};
 
 // Function to update the dashboard
 function updateDashboard() {
     fetch('/api/data')  
         .then(response => {
-            // console.log('Response received:', response);
+            console.log('Response received:', response);
             return response.json();
         })
         .then(data => {
-            // console.log('Data received:', data);
+            console.log('Data received:', data);
             if (data.length > 0) {
                 const latest = data[0];
                 console.log('Latest data:', latest);
                 console.log('Battery voltage:', latest.battery_voltage);
-                // Update current values
-                // document.getElementById('battery').textContent = latest.battery_voltage;
-                
-                document.getElementById('charts.battery').textContent = latest;
+
+                // Check if battery_voltage exists in the latest data
+                if (latest.hasOwnProperty('battery_voltage')) {
+                    // Update current values
+                    document.getElementById('battery').textContent = latest.battery_voltage;
+                } else {
+                    console.error('battery_voltage property is missing in the latest data');
+                }
 
                 // Update charts
                 const chartData = data.reverse().map(reading => ({
