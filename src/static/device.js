@@ -1,13 +1,6 @@
 function createChart(containerId, title, yAxisTitle, seriesName) {
     return Highcharts.chart(containerId, {
-        // color: {
-            
-        //     linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
-        //     stops: [
-        //     [  0, '#003399'],
-        //             [1, '#3366AA']
-        //                 ]
-        //     }, 
+
         chart: {
             backgroundColor: '#3b4252',
             type: 'line'
@@ -166,4 +159,65 @@ function fetchDeviceStatus(deviceName) {
         .catch((error) => {
             console.error('Error:', error);
         });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initializeChart();
+    fetchDataFromESP8266();
+    setInterval(fetchDataFromESP8266, 5000); // Fetch data every 5 seconds
+});
+
+function initializeChart() {
+    Highcharts.chart('chart-battery', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Battery Voltage Over Time'
+        },
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: 'Time'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Voltage (V)'
+            }
+        },
+        series: [{
+            name: 'Battery Voltage',
+            data: []
+        }]
+    });
+}
+
+function fetchDataFromESP8266() {
+    fetch('http://192.168.58.43/data')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data from ESP8266:', data);
+            updateDashboard(data);
+        })
+        .catch(error => console.error('Error fetching data from ESP8266:', error));
+}
+
+function updateDashboard(data) {
+    if (data && data.battery_voltage !== undefined) {
+        document.getElementById('battery').textContent = data.battery_voltage;
+        document.getElementById('ledState').textContent = data.led_relayState ? 'On' : 'Off';
+
+        // Update the chart with new data
+        const chart = Highcharts.charts[0]; // Assuming the chart is the first one
+        const time = (new Date()).getTime(); // Current time
+        chart.series[0].addPoint([time, data.battery_voltage], true, true);
+    } else {
+        console.error('Invalid data format:', data);
+    }
 }

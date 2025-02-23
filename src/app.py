@@ -55,12 +55,13 @@ def devices_page(theDevice):
                 current_device.append({'assigned_place': row['Assigned_Place'], 'status': row['Status'], 'ip': row['IP'], 'main_node': row['Main_Node'], 'nearby_nodes': row['Nearby_Nodes']})
     return render_template('device.html', nearby_devices=nearby_devices, devices_under_main_node=devices_under_main_node, device_name=device_name, total_devices=total_devices,current_device=current_device)
 
+
 @app.route('/api/control', methods=['POST'])
 def control_esp():
     try:
         data = request.get_json()
         state = data.get('state', False)
-        esp_url = f"http://{ESP8266_IP}:{ESP8266_PORT}/control"
+        esp_url = f"http://{ESP8266_IP}:{ESP8266_PORT}/data"
         response = requests.post(esp_url, json={'state': state}, timeout=5)
         if response.status_code == 200:
             return jsonify({"status": "success", "state": state}), 200

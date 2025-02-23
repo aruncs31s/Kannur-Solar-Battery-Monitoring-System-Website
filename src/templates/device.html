@@ -3,7 +3,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='device.css') }}" />
 {% endblock %} {% block content %}
 <div class="dashboard">
-  <!-- <main> -->
   <div class="current-values">
     <div class="row">
       <div class="column-left">
@@ -17,66 +16,62 @@
           </button>
           <p class="button-status" id="buttonStatus">Status: Inactive</p>
           <p>Battery: <span id="battery">--</span>V</p>
+          <p>LED State: <span id="ledState">--</span></p>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- <div class="device-status">
-            <h2>Device Status</h2>
-
-            <ul id="deviceList"></ul>
-        </div> -->
-  <!-- </main> -->
 </div>
 
 <div class="related-devices">
-
-    
-<div class="nearby-devices" style="padding-bottom: 100px">
-  <h2>Nearby Devices</h2>
-  <div class="device-list">
-    {% for device in nearby_devices %}
-    <li
-      class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}"
-      id="list"
-    >
+  <div class="nearby-devices" style="padding-bottom: 100px">
+    <h2>Nearby Devices</h2>
+    <div class="device-list">
+      {% for device in nearby_devices %}
+      <li
+        class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}"
+        id="list"
+      >
         <a
           href="/device/{{ device.assigned_place }}"
           onclick="sendDeviceInfo('{{ device.name }}')"
-          class="button-link"> {{ device.assigned_place }}
+          class="button-link"
+        >
+          {{ device.assigned_place }}
         </a>
         <div>
-            <span> {{ device.status }} - IP: {{ device.ip }} </span>    
+          <span> {{ device.status }} - IP: {{ device.ip }} </span>
         </div>
-    </li>
+      </li>
 
-    {% endfor %}
-
+      {% endfor %}
+    </div>
   </div>
-</div>
   <div class="device-under-main-node">
     <div class="device-list">
-        <h2>Devices under Main Node</h2>
-        {% for device in devices_under_main_node %}
-        <li
-          class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}"
-          id="list"
+      <h2>Devices under Main Node</h2>
+      {% for device in devices_under_main_node %}
+      <li
+        class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}"
+        id="list"
+      >
+        <a
+          href="/device/{{ device.assigned_place }}"
+          onclick="sendDeviceInfo('{{ device.name }}')"
+          class="button-link"
         >
-            <a
-              href="/device/{{ device.assigned_place }}"
-              onclick="sendDeviceInfo('{{ device.name }}')"
-              class="button-link"> {{ device.assigned_place }}
-            </a>
-            <div>
-                <span> {{ device.status }} - IP: {{ device.ip }} </span>    
-            </div>
-        </li>
-    
-        {% endfor %}
-    </div>
+          {{ device.assigned_place }}
+        </a>
+        <div>
+          <span> {{ device.status }} - IP: {{ device.ip }} </span>
+        </div>
+      </li>
+
+      {% endfor %}
     </div>
   </div>
+</div>
 
 <script src="{{ url_for('static', filename='device.js') }}"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
 {% endblock %}

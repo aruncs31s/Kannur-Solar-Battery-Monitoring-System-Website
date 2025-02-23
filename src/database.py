@@ -6,7 +6,6 @@ class Database:
         self.connection = sqlite3.connect("sensor_data.db")
         self.cursor = self.connection.cursor()
         self.create_table()
-        print("hello")
 
     def create_table(self):
         self.cursor.execute(
