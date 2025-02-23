@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Solar Battery Monitoringgg System{% endblock %}</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    {% block extra_js %}
+    
+    {% endblock %}
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
-    {% block extra_css %}{% endblock %}
+    {% block extra_css %}
+    
+    {% endblock %}
 </head>
 <body>
     <header>    

@@ -8,31 +8,7 @@ header {
     font-size: 24px;
 }
 
-/**/
-/* ul { */
-/*     list-style-type: none; */
-/*     padding: 0; */
-/*     display: flex; */
-/*     flex-direction: column; */
-/*     align-items: center; */
-/* } */
-/**/
-/* li { */
-/*     background-color: var(--nord2); */
-/*     margin: 10px 0; */
-/*     padding: 10px; */
-/*     border-radius: 5px; */
-/*     max-width: 600px; */
-/*     width: 100%; */
-/*     box-sizing: border-box; */
-/* } */
 
-/* main .current-values { */
-/*     text-align: center; */
-/*     background-color: var(--nord1); */
-/**/
-/* } */
-/**/
 .dashboard {
     text-align: center;
 }
@@ -69,13 +45,7 @@ header {
     font-style: italic;
 }
 
-/* .control-panel {
-    display: flex;
-    flex-direction: column ;
-    align-items: center;
-    justify-content: center;
-    /* height: 100vh; Full viewport height */
-/* } */
+
 
 main .device-status {
     margin: 20px;
@@ -98,8 +68,8 @@ main .column-right {
     flex-direction: column;
 }
 
-/* For All devices which are nearby and under the main node */
 
+*/
 .related-devices{
     background-color: var(--nord1);
     display: flex;
@@ -110,13 +80,8 @@ main .column-right {
     border-radius: 10px;
     margin-bottom: 100px;
 }
-/* For Nearby devices */
 
-/* .nearby-devices .device-list{
-display: flex;
-flex-direction: column;
 
- } */
 .device-list li{
     width: 120%;
     margin: 10px 0;
@@ -127,6 +92,7 @@ flex-direction: column;
     justify-content: space-between; 
     align-items: center;
  } 
+
 
 .device-list span a:hover{
     background-color: var(--nord3);

@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, render_template
 import sqlite3
 import csv
 from database import Database
+from scraper import get_esp_data 
 
 db = Database()
 app = Flask(__name__)
@@ -75,7 +76,8 @@ def control_esp():
 @app.route('/api/data', methods=['POST'])
 def receive_data():
     try:
-        data = request.get_json()
+        data = get_esp_data()
+        print(data)
         conn = sqlite3.connect('sensor_data.db')
         c = conn.cursor()
         c.execute('''INSERT INTO sensor_readings (battery_voltage) VALUES (?)''', (data.get('battery_voltage'),))
@@ -85,27 +87,34 @@ def receive_data():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 @app.route('/api/data', methods=['GET'])
 def get_data():
-    try:
-        timeframe = request.args.get('timeframe', 'hour')
-        conn = sqlite3.connect('sensor_data.db')
-        c = conn.cursor()
-        if timeframe == 'hour':
-            time_constraint = "datetime('now', '-1 hour')"
-        elif timeframe == 'day':
-            time_constraint = "datetime('now', '-1 day')"
-        elif timeframe == 'week':
-            time_constraint = "datetime('now', '-7 days')"
-        else:
-            time_constraint = "datetime('now', '-1 hour')"
-        c.execute(f'''SELECT * FROM sensor_readings WHERE timestamp > {time_constraint} ORDER BY timestamp DESC''')
-        rows = c.fetchall()
-        conn.close()
-        data = [{'id': row[0], 'battery_voltage': row[1], 'timestamp': row[2]} for row in rows]
-        return jsonify(data), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+    data = get_esp_data()
+    print(data)
+    return jsonify(data), 200
+
+# def get_data():
+#     try:
+#         timeframe = request.args.get('timeframe', 'hour')
+#         conn = sqlite3.connect('sensor_data.db')
+#         c = conn.cursor()
+#         if timeframe == 'hour':
+#             time_constraint = "datetime('now', '-1 hour')"
+#         elif timeframe == 'day':
+#             time_constraint = "datetime('now', '-1 day')"
+#         elif timeframe == 'week':
+#             time_constraint = "datetime('now', '-7 days')"
+#         else:
+#             time_constraint = "datetime('now', '-1 hour')"
+#         c.execute(f'''SELECT * FROM sensor_readings WHERE timestamp > {time_constraint} ORDER BY timestamp DESC''')
+#         rows = c.fetchall()
+#         conn.close()
+
+#         data = [{'id': row[0], 'battery_voltage': row[1], 'timestamp': row[2]} for row in rows]
+#         return jsonify(data), 200
+#     except Exception as e:
+#         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/device-click', methods=['POST'])
 def device_click():
