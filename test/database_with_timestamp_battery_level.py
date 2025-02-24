@@ -31,6 +31,7 @@ insert_user("Bob", 25)
 insert_user("Charlie", 35)
 
 
+
 def get_users():
     today = datetime.now().strftime("%Y-%m-%d")
     cursor.execute(

@@ -32,7 +32,9 @@ def get_esp_data():
     try:
         esp_response = requests.get(esp_url)
         data_json = esp_response.json()
+        # TODO: Make it as object with {}
         data = [
+            
             # data_json["temperature"],
             # data_json["humidity"],
             data_json["battery_voltage"],

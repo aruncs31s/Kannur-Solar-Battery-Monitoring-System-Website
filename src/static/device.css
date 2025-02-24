@@ -68,8 +68,6 @@ main .column-right {
     flex-direction: column;
 }
 
-
-*/
 .related-devices{
     background-color: var(--nord1);
     display: flex;

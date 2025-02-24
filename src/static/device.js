@@ -69,6 +69,7 @@ function updateDashboard() {
         .then(data => {
             console.log('Data received:', data);
             if (data.length > 0) {
+                co
                 const latest = data[0];
                 console.log('Latest data:', latest);
                 console.log('Battery voltage:', latest.battery_voltage);
@@ -82,17 +83,42 @@ function updateDashboard() {
                 }
 
                 // Update charts
-                const chartData = data.reverse().map(reading => ({
-                    battery: [new Date(reading.timestamp).getTime(), reading.battery_voltage]
-                }));
+                // const chartData = data.reverse().map(reading => ({
+                //     battery: [new Date(reading.timestamp).getTime(), reading.battery_voltage]
+                // }));
 
-                charts.battery.series[0].setData(chartData.map(d => d.battery));
+                // charts.battery.series[0].setData(chartData.map(d => d.battery));
             } else {
                 console.log('No data available');
             }
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+setInterval(function() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            // Get Json response
+
+            var data = JSON.parse(this.responseText);
+
+            // Get current time
+            var x = (new Date()).getTime(),
+                // Get battery_voltage
+                y = parseFloat(data[0]);
+                // y = parseFloat(data.battery_voltage);
+            if (charts.battery.series[0].data.length > 4000) {
+                charts.battery.series[0].addPoint([x, y], true, true, true);
+            } else {
+                charts.battery.series[0].addPoint([x, y], true, false, true);
+            }
+        }
+    };
+    xhttp.open("GET", "/data", true);
+    xhttp.send();
+}, 1000);
+
+
 
 // Update dashboard every 5 seconds
 setInterval(updateDashboard, 5000);
