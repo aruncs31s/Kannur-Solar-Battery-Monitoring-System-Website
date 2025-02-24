@@ -4,3 +4,5 @@ with open('devices.csv', newline='') as csvfile:
     for row in reader:
         if row['Assigned_Place'] == 'Parassini_Kadavu':
             print(row['IP'])
+
+

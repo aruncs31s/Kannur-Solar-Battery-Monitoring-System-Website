@@ -42,7 +42,22 @@ def get_users():
     for row in rows:
         print(f"ID: {row[0]}, Name: {row[1]}, Age: {row[2]}, Timestamp: {row[3]}")
 
+def upate_device_list():
+    with open('./devices.csv', 'r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip the header row
+        for row in reader:
+            ip_address = row[0]
+            assigned_place = row[1]
+            main_node = row[4]
+            if not device_exists(ip_address):
+                insert_device(ip_address, assigned_place, main_node)
+                print(f"Inserted device with IP address {ip_address}")
+            else:
+                print(f"Device with IP address {ip_address} already exists")
 
+# Example usage
+upate_device_list()
 # Retrieve and print the data
 get_users()
 
