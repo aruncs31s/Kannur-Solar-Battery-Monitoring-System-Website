@@ -64,7 +64,9 @@ def get_esp_data():
 #             time_now = datetime.now().strftime("%H:%M:%S")
 #             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 #             print(f"{time_now} Battery Voltage {data[0]} - Relay State {data[1]} \n")
-#             # if int(datetime.now().strftime("%M")) % 5 == 0:
+#             # if int(datetime.now().strftime("%M")) % 5 == 0:git config --global user.name "aruncs31s"
+git config --global user.email "aruncs31ss@gmail.com"
+
 #             # Save to file
 #             is_file_exists = os.path.isfile(output_file)
 #             with open(output_file, "a") as f:
