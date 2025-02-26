@@ -8,7 +8,7 @@ from database import Database
 from scraper import get_esp_data
 from datetime import datetime
 
-db = Database()
+# db = Database()
 app = Flask(__name__)
 ESP8266_IP = "192.168.58.43"
 ESP8266_PORT = 80
@@ -36,6 +36,29 @@ def home():
     ]
     sorted_devices = active_devices + inactive_devices
     return render_template("home.html", devices=sorted_devices)
+
+
+@app.route("/device/get_near_nodes/<device>", methods=["GET"])
+def get_near_nodes(device):
+    # This is used as a central node 
+    current_node = device
+    main_node = ''
+    near_nodes = []
+    with open("devices.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row["Assigned_Place"] == current_node:
+                main_node = row["Main_Node"]
+                break
+    print(f"main node is {main_node}")
+    with open("devices.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row["Nearby_Nodes"] == current_node:
+                near_nodes.append(row["Assigned_Place"])
+    print(f" near nodes {near_nodes}")
+    print(jsonify({"current_node": current_node, "near_nodes": near_nodes}))
+    return jsonify({"current_node": current_node, "near_nodes": near_nodes})
 
 
 @app.route("/device/<theDevice>", methods=["GET"])
@@ -77,6 +100,7 @@ def devices_page(theDevice):
                         "nearby_nodes": row["Nearby_Nodes"],
                     }
                 )
+                
     total_devices = nearby_devices + devices_under_main_node
     current_device = []
     # Check if this is absolutely necessary
@@ -149,10 +173,10 @@ def receive_data():
 @app.route("/api/data", methods=["GET"])
 def get_data():
     # data = get_esp_data()
-    data = db.get_data(date=datetime.now().timestamp())
-    print(data)
-    
-    return jsonify(data), 200
+    # data = db.get_data(date=datetime.now().timestamp())
+    # print(data)
+    return jsonify({"status": "error", "message": "change_me"}), 500
+    # return jsonify(data), 200
 
 
 # def get_data():
@@ -163,7 +187,7 @@ def get_data():
 #         if timeframe == 'hour':
 #             time_constraint = "datetime('now', '-1 hour')"
 #         elif timeframe == 'day':
-            time_constraint = "datetime('appnow', '-1 day')"
+            # time_constraint = "datetime('appnow', '-1 day')"
 #         elif timeframe == 'week':
 #             time_constraint = "datetime('now', '-7 days')"
 #         else:

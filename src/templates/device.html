@@ -4,6 +4,8 @@
 %} 
 {% block extra_js %}  
 <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+
 {% endblock %}
 
 {% block extra_css %}
@@ -17,7 +19,7 @@
         <div id="chart-battery" class="chart-container"></div>
       </div>
       <div class="column-right">
-        <h3>Device: {{ device_name }}</h3>
+        <h3 id="current-node" > Device: {{ device_name }}</h3>
         <div class="control-panel">
           <button id="controlButton" class="control-button">
             Toggle Control
@@ -43,7 +45,7 @@
         <a
           href="/device/{{ device.assigned_place }}"
           onclick="sendDeviceInfo('{{ device.name }}')"
-          class="button-link"
+          class="button-link" 
         >
           {{ device.assigned_place }}
         </a>
@@ -53,7 +55,10 @@
       </li>
 
       {% endfor %}
+      <div id="graph-container"></div>
     </div>
+
+
   </div>
   <div class="device-under-main-node">
     <div class="device-list">

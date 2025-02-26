@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('search-input').addEventListener('input', searchDevices);
     document.querySelector('.search-bar button:nth-child(2)').addEventListener('click', sortDevices);

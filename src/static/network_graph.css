@@ -1,0 +1,17 @@
+.graph-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#graph-container {
+    min-width: 25rem;
+    max-width: 43.75rem; /* Converted 700px to rem */
+    margin: auto;
+    padding-left: 2rem;
+    text-align: left;
+    position: fixed; /* Change to fixed position */
+    right: 10%; /* Align to the right */
+    top: 25%; /* Align to the top */
+}
+
+

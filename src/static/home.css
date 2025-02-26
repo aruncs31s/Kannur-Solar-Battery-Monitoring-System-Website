@@ -1,11 +1,16 @@
 /* Nord Theme Colors */
 @import "base.css";
 
+
 ul {
+  width: 30rem;
   list-style-type: none;
-  padding: 0;
+  /* padding: 0; */
   display: flex;
   flex-direction: column;
+    /* position: relative; */
+  top: 0;
+  left: 0;
   align-items: center;
 }
 
@@ -14,7 +19,7 @@ li {
   margin: 10px 0;
   padding: 10px;
   border-radius: 5px;
-  max-width: 600px;
+  max-width: 44rem;
   width: 100%;
   box-sizing: border-box;
   display: flex;
@@ -38,6 +43,8 @@ button:hover {
 }
 
 .device_list {
+  display: flex;
+  flex-direction: column;
   position: center;
   padding-bottom: 100px;
 }
@@ -80,3 +87,16 @@ button:hover {
   color: white;
 }
 
+.row {
+top: 0;
+left:0;
+  /* display: flex; */
+  flex-direction: column;
+  margin-left: 2rem;
+}
+
+main .column {
+  margin: auto;
+  display: flex;
+  /* flex-direction: column; */
+}

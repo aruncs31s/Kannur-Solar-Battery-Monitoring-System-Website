@@ -2,19 +2,33 @@
 
 {% block title %}Home - Solar Battery Monitor{% endblock %}
 
+{% block extra_js %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+    <!-- <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script> -->
+{% endblock %}
 {% block extra_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='network_graph.css') }}">
 {% endblock %}
 
 {% block content %}
+
     <h2 class="devices">Devices Lists</h2>
-    <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search devices by Place">
-        <button onclick="searchDevices()" class="search-button" style="margin-left: .3rem;">Search</button>
-        <button onclick="sortDevices()" style="margin-left: 2rem;">Sort by Status</button>
-    </div>
-    <div class="device_list">
-        <ul id="device-list">
+ 
+
+
+<div class="row">
+
+
+        <ul id="device-list" >
+            <div class="device_list column">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search devices by Place">
+                    <button onclick="searchDevices()" class="search-button" style="margin-left: .3rem;">Search</button>
+                    <button onclick="sortDevices()" style="margin-left: 2rem;">Sort by Status</button>
+                </div>
             {% for device in devices %}
                 <li class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}">
                     <div>
@@ -27,5 +41,9 @@
             {% endfor %}
         </ul>
     </div>
+    <div id="graph-container" class="column" ></div>
+</div>
+
     <script src="{{ url_for('static', filename='home.js') }}"></script>
+    <script  src="{{ url_for('static', filename='network_graph.js') }}"></script>
 {% endblock %}
