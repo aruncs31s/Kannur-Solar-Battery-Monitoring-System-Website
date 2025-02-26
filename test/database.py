@@ -3,6 +3,8 @@ from datetime import datetime
 import os 
 import csv 
 
+debug=1
+
 # Register the adapter for datetime
 sqlite3.register_adapter(datetime, lambda val: val.isoformat())
 sqlite3.register_converter("DATETIME", lambda val: datetime.fromisoformat(val.decode("utf-8")))
@@ -45,21 +47,19 @@ class Database:
             VALUES (?, ?, ?)
         ''', (ip_address,assigned_place, main_node))
         self.conn.commit()
-
-
     def upate_device_list(self,csv_file_name):
         with open(csv_file_name, 'r') as file:
             reader = csv.reader(file)
             for row in reader:
-                # Ignore the header 
-                if row[0] == 'IP':
-                        continue
+                print(row)
                 if(self.device_exists(row[0])):
-                    print(f'ip: {row[0]} is already exists')
+                    if(debug):
+                        print(f'ip: {row[0]} is already exists')
                 else:
                     self.insert_device(row[0], row[1], row[4])
-                    print(f'ip: {row[0]} , place: {row[1]} , main_node {row[4]}')
-                    # print(f'Device Name: {row[0]}')
+                    if(debug):
+                        print(f'ip: {row[0]} , place: {row[1]} , main_node {row[4]}')
+                    print(f'Device Name: {row[0]}')
     def device_exists(self,ip_address):
         self.cursor.execute('''
         SELECT COUNT(*) FROM device_info WHERE ip_address = ?
@@ -84,3 +84,6 @@ class Database:
         for row in rows:
             print(row[3])
             # print('hi')
+    ''' implement a function that takes the device id and data{battery voltage } as the params and insert the data into the database'''
+    '''also implement a function to retrive data acording to date , month , week etc .. args{device_id , something to specify the date range}'''
+     
