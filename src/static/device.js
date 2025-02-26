@@ -218,7 +218,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 enabled: true,
                 linkFormat: '',
                 style: {
-                    color: getComputedStyle(document.documentElement).getPropertyValue('--nord8')
+                    color: 'white',
+                    textOutline: 'none',
+                    fontWeight: 'normal',
+                    fontSize: '14px'
+                    // color: getComputedStyle(document.documentElement).getPropertyValue('--nord8'),
                 }
             }
         }]

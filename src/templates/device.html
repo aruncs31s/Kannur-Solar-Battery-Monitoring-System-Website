@@ -55,10 +55,8 @@
       </li>
 
       {% endfor %}
-      <div id="graph-container" class="graph-container" style="width: auto;"></div>
     </div>
-
-
+    <div id="graph-container" class="graph-container" ></div>
   </div>
   <div class="device-under-main-node">
     <div class="device-list">
@@ -84,5 +82,6 @@
     </div>
   </div>
 </div>
+
 <script src="{{ url_for('static', filename='device.js') }}"></script>
 {% endblock %}

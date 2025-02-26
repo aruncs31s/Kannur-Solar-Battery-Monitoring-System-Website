@@ -83,13 +83,16 @@ main .column-right {
     background-color: var(--nord1);
     display: flex;
     flex-direction: column;
-    /* justify-content: space-around;
-    padding-bottom: 100px;
-    margin: 20px;
-    border-radius: 10px;
-    margin-bottom: 100px; */
+    justify-content: space-around;
+
 }
-.device-list{
+    /* flex-direction: column; */
+    /* /* justify-content: space-around; */
+    /* padding-bottom: 100px; */
+    /* margin: 20px; */
+    /* border-radius: 10px; */
+    /* margin-bottom: 100px; */ 
+/* .device-list{
     display: flex;
     /* flex-direction: column; */
     /* justify-content: space-around; */
@@ -97,10 +100,9 @@ main .column-right {
     /* margin: 20px; */
     /* border-radius: 10px; */
     /* margin-bottom: 100px; */
-}
 
 .device-list li{
-    width: 120%;
+    width: 125%;
     margin: 10px 0;
     padding: 10px;
     border-radius: 10px;
@@ -114,6 +116,13 @@ main .column-right {
 .device-list span a:hover{
     background-color: var(--nord3);
     color: var(--nord6);
+}
+
+#graph-container{
+width: 33rem;
+height: 20rem;
+margin: 0 auto;
+
 }
 .device-under-main-node{
     background-color: var(--nord1);
