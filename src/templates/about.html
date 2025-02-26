@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} Device - {{ device_name }} {% endblock
+%} 
+{% block extra_js %}  
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/networkgraph.js"></script>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='device.css') }}" />
+{% endblock %} 
+
+{% block content %}
+
+<p style="padding: 10px 10px 10px 10px;"> 
+    This website has possible only thanks to <a href="https://flask.palletsprojects.com/en/stable/">Flask</a> , and <a href="https://www.highcharts.com/docs/chart-and-series-types/network-graph">Highcharts</a>. For all the source code refer the <a href="Kannur-Solar-Battery-Monitoring-System-Website">Github Repo</a>
+</p>
+
+
+
+{% endblock %}

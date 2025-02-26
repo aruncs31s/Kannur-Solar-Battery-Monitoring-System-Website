@@ -93,12 +93,12 @@ function updateDashboard() {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
 setInterval(function() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             // Get Json response
-
             var data = JSON.parse(this.responseText);
 
             // Get current time
@@ -117,14 +117,13 @@ setInterval(function() {
     xhttp.send();
 }, 1000);
 
-
 // For Network Graph
 // Declare a global variable to store the fetched data
 let nearNodesData = [];
 
 // Function to fetch data and store in the global variable
 function fetchNearNodes(current_node) {
-    fetch('http://localhost:5000/device/get_near_nodes/' + current_node)
+    return fetch('http://localhost:5000/device/get_near_nodes/' + current_node)
         .then(response => {
             console.log('Response received:', response);
             return response.json();
@@ -132,6 +131,7 @@ function fetchNearNodes(current_node) {
         .then(data => {
             console.log('Data received:', data);
             nearNodesData = data; // Store data in the global variable
+            return data;
         })
         .catch(error => {
             console.error('Error fetching data:', error);
@@ -139,29 +139,35 @@ function fetchNearNodes(current_node) {
 }
 
 function getTotalNearNodes() {
-    console.log('Near nodes data:',nearNodesData['near_nodes']);
+    console.log('Near nodes data:', nearNodesData['near_nodes']);
     return nearNodesData['near_nodes'].length;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
+    // Thanks: https://www.highcharts.com/docs/chart-and-series-types/network-graph 
     const current_node = document.getElementById('current-node').innerHTML.split(':').map(part => part.trim())[1];
     console.log(current_node);
 
-    fetchNearNodes(current_node);
+    await fetchNearNodes(current_node);
 
-    setTimeout(() => {
-        const total_near_nodes = getTotalNearNodes();
-        console.log('Total near nodes:', total_near_nodes);
-    }, 1000); // Delay to ensure data is fetched before accessing
+    const total_near_nodes = getTotalNearNodes();
+    console.log('Total near nodes:', total_near_nodes);
+
+    let near_node_arr = [];
     for (let i = 0; i < total_near_nodes; i++) {
-        console.log(nearNodesData['near_nodes'][i]);
+        near_node_arr.push([current_node, nearNodesData['near_nodes'][i]]);
     }
-    // console.log('DOM fully loaded and parsed');
+    console.log('nodes');
+    console.log(near_node_arr);
+
     Highcharts.chart('graph-container', {
         chart: {
             type: 'networkgraph',
             plotBorderWidth: 1,
-            backgroundColor: '#2e3440',
+            backgroundColor: '#3b4252',
+        },
+        credits: {
+            enabled: false
         },
         title: {
             text: null // Disable the title
@@ -170,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
             networkgraph: {
                 keys: ['from', 'to'],
                 marker: {
-                    radius: 6 // Set the default node size
+                    radius: 7 // Set the default node size
                 },
                 events: {
                     click: function (event) {
@@ -200,41 +206,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             name: 'K8',
-
-            data: [
-                [current_node, 'Iritty'],
-                ['Kannur', 'Kannur'],
-                ['Kannur', 'Payyannur']
-            ],
+            data: near_node_arr,
             nodes: [{
-                id: 'Kannur',
+                id: current_node,
                 color: 'green', // Change the color to green
                 marker: {
-                    radius: 15 // Increase the size of the Kannur node
-                }
-            }, {
-                id: 'Iritty',
-                color: 'red', // Change the color to red
-                marker: {
-                    radius: 10 // Set the size of the Iritty node
-                }
-            }, {
-                id: 'Thalasseri',
-                color: 'red',
-                marker: {
-                    radius: 10
-                }
-            }, {
-                id: 'Payyannur',
-                color: 'red',
-                marker: {
-                    radius: 10
-                }
-            }, {
-                id: 'Taliparamba',
-                color: 'red',
-                marker: {
-                    radius: 10
+                    radius: 14 // Increase the size of the current node
                 }
             }],
             dataLabels: {

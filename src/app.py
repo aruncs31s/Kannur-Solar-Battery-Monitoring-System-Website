@@ -38,6 +38,9 @@ def home():
     return render_template("home.html", devices=sorted_devices)
 
 
+@app.route("/about/")
+def about():
+    return render_template("about.html")
 @app.route("/device/get_near_nodes/<device>", methods=["GET"])
 def get_near_nodes(device):
     # This is used as a central node 

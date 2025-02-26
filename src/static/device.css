@@ -79,6 +79,25 @@ main .column-right {
     margin-bottom: 100px;
 }
 
+.nearby-devices{
+    background-color: var(--nord1);
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-around;
+    padding-bottom: 100px;
+    margin: 20px;
+    border-radius: 10px;
+    margin-bottom: 100px; */
+}
+.device-list{
+    display: flex;
+    /* flex-direction: column; */
+    /* justify-content: space-around; */
+    /* padding-bottom: 100px; */
+    /* margin: 20px; */
+    /* border-radius: 10px; */
+    /* margin-bottom: 100px; */
+}
 
 .device-list li{
     width: 120%;

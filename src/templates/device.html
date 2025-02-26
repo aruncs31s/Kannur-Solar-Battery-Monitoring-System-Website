@@ -34,9 +34,9 @@
 </div>
 
 <div class="related-devices">
-  <div class="nearby-devices" style="padding-bottom: 100px">
+  <div class="nearby-devices">
     <h2>Nearby Devices</h2>
-    <div class="device-list">
+    <div class="device-list" >
       {% for device in nearby_devices %}
       <li
         class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}"
@@ -55,7 +55,7 @@
       </li>
 
       {% endfor %}
-      <div id="graph-container"></div>
+      <div id="graph-container" class="graph-container" style="width: auto;"></div>
     </div>
 
 
