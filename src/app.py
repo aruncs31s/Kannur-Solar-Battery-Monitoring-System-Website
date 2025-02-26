@@ -6,6 +6,7 @@ from flask import Flask, jsonify, render_template, request
 
 from database import Database
 from scraper import get_esp_data
+from datetime import datetime
 
 db = Database()
 app = Flask(__name__)
@@ -147,8 +148,10 @@ def receive_data():
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    data = get_esp_data()
+    # data = get_esp_data()
+    data = db.get_data(date=datetime.now().timestamp())
     print(data)
+    
     return jsonify(data), 200
 
 
@@ -160,7 +163,7 @@ def get_data():
 #         if timeframe == 'hour':
 #             time_constraint = "datetime('now', '-1 hour')"
 #         elif timeframe == 'day':
-#             time_constraint = "datetime('now', '-1 day')"
+            time_constraint = "datetime('appnow', '-1 day')"
 #         elif timeframe == 'week':
 #             time_constraint = "datetime('now', '-7 days')"
 #         else:

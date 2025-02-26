@@ -67,7 +67,7 @@ class Database:
         count = self.cursor.fetchone()[0]
         return count > 0
     # Function to insert timeseries data
-    def insert_timeseries_data(self,device_id, voltage):
+    def insert_data(self,device_id, voltage):
         # iam planning to use the ip as the device id .
         timestamp = datetime.now()
         self.cursor.execute('''
@@ -76,14 +76,13 @@ class Database:
         ''', (device_id, timestamp, voltage))
         self.conn.commit()
     # device id ? 1 try using the ip as the device id?? 
-    def get_timeseries_data(self,device_id):
+    def get_data(self, device_id, date):
+        data = {}
         self.cursor.execute('''
-        SELECT * FROM timeseries_data WHERE device_id = ?
-        ''', (device_id,))
+        SELECT * FROM timeseries_data WHERE device_id = ? AND timestamp >= date(?)
+        ''', (device_id, date))
         rows = self.cursor.fetchall()
-        for row in rows:
-            print(row[3])
-            # print('hi')
-    ''' implement a function that takes the device id and data{battery voltage } as the params and insert the data into the database'''
-    '''also implement a function to retrive data acording to date , month , week etc .. args{device_id , something to specify the date range}'''
+        return rows
+        ''' implement a function that takes the device id and data{battery voltage } as the params and insert the data into the database'''
+        '''also implement a function to retrive data acording to date , month , week etc .. args{device_id , something to specify the date range}'''
      
