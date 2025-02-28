@@ -15,7 +15,7 @@ sqlite3.register_converter(
 class Database:
     # Creates a database container
     def __init__(self, databse_name):
-        self.conn = sqlite3.connect(databse_name, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
+        self.conn = sqlite3.connect(databse_name, detect_types=sqlite3.PARSE_DECLTYPES)
         self.cursor = self.conn.cursor()
         #  This function should be only called ones
         self.cursor.execute(

@@ -102,7 +102,7 @@ main .column-right {
     /* margin-bottom: 100px; */
 
 .device-list li{
-    width: 125%;
+    width: 100%;
     margin: 10px 0;
     padding: 10px;
     border-radius: 10px;
@@ -129,6 +129,42 @@ margin: 0 auto;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+}
+
+/* Bouncing Box Styles */
+.bouncing-box {
+    width: 150px;
+    height: 80px;
+    background-color: var(--nord8);
+    color: var(--nord0);
+    border-radius: 8px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: bounce 2s infinite;
+    cursor: pointer;
+    text-align: center;
+    padding: 10px;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.bouncing-box:hover {
+    animation-play-state: paused;
+    background-color: var(--nord9);
 }
 
 

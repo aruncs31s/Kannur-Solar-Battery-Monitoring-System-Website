@@ -1,17 +1,19 @@
 # app.py
 import csv
 import sqlite3
-
+from datetime import datetime
+import time
 from flask import Flask, jsonify, render_template, request
 
 from database import Database
 from scraper import get_esp_data
-from datetime import datetime
 
 # db = Database()
 app = Flask(__name__)
 ESP8266_IP = "192.168.58.43"
 ESP8266_PORT = 80
+
+db = Database("the_database.db")
 
 
 @app.route("/")
@@ -41,12 +43,58 @@ def home():
 @app.route("/about/")
 def about():
     return render_template("about.html")
+
+
+@app.route("/devices")
+def devices():
+    return render_template("devices.html")
+
+
+@app.route("/device/get_all_nodes/<device>", methods=["GET"])
+def get_all_nodes(device):
+    # This is used as a central node
+    current_node = device
+    main_node = ""
+    near_all_nodes = []
+    with open("devices.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row["Assigned_Place"] == current_node:
+                main_node = row["Main_Node"]
+                break
+    # print(f"main node is {main_node}")
+    with open("devices.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row["Main_Node"] == main_node:
+                near_all_nodes.append(row["Assigned_Place"])
+    # print(f" near nodes {near_all_nodes}")
+    print(jsonify({"current_node": current_node, "near_all_nodes": near_all_nodes}))
+    return jsonify(
+        {
+            "current_node": current_node,
+            "near_all_nodes": near_all_nodes,
+            "main_node": main_node,
+        },
+        200,
+    )
+
+
+# this api is to get the nearby nodes of the current device.
+# TODO: decide if i want to implement recursive search to find the neighbouring devices.
+
+
 @app.route("/device/get_near_nodes/<device>", methods=["GET"])
 def get_near_nodes(device):
-    # This is used as a central node 
+
+    # NOTE: This is used as a central node and other nodes should wrap around this
+
     current_node = device
-    main_node = ''
+    # Just initializing the main_node as a string
+    main_node = ""
+    # To store the neighbouring nodes
     near_nodes = []
+
     with open("devices.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -103,7 +151,7 @@ def devices_page(theDevice):
                         "nearby_nodes": row["Nearby_Nodes"],
                     }
                 )
-                
+
     total_devices = nearby_devices + devices_under_main_node
     current_device = []
     # Check if this is absolutely necessary
@@ -172,14 +220,26 @@ def receive_data():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+def send_top_data():
+    i = '192.168.1.2'
+    data = db.get_data(i, '2025-02-26')
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    # data = get_esp_data()
-    # data = db.get_data(date=datetime.now().timestamp())
-    # print(data)
-    return jsonify({"status": "error", "message": "change_me"}), 500
-    # return jsonify(data), 200
+    print('date_requested to /api/data')
+    TIME_INDEX = 2
+    BAT_INDEX = 3
+    ip = '192.168.1.3'
+    raw_data = db.get_data(ip, date=datetime.now().date())
+    print(len(raw_data))
+    data = [
+        {
+            'timestamp': row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),
+            'battery_voltage': row[BAT_INDEX]
+        }
+        for row in raw_data
+    ]
+    return jsonify(data), 200
 
 
 # def get_data():
@@ -190,7 +250,7 @@ def get_data():
 #         if timeframe == 'hour':
 #             time_constraint = "datetime('now', '-1 hour')"
 #         elif timeframe == 'day':
-            # time_constraint = "datetime('appnow', '-1 day')"
+# time_constraint = "datetime('appnow', '-1 day')"
 #         elif timeframe == 'week':
 #             time_constraint = "datetime('now', '-7 days')"
 #         else:

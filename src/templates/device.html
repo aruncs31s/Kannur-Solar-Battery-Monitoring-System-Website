@@ -36,6 +36,8 @@
 <div class="related-devices">
   <div class="nearby-devices">
     <h2>Nearby Devices</h2>
+    <div id="graph-container" class="graph-container" ></div>
+
     <div class="device-list" >
       {% for device in nearby_devices %}
       <li
@@ -56,7 +58,6 @@
 
       {% endfor %}
     </div>
-    <div id="graph-container" class="graph-container" ></div>
   </div>
   <div class="device-under-main-node">
     <div class="device-list">
