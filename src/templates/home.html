@@ -9,8 +9,8 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script> -->
 {% endblock %}
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='network_graph.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/network_graph.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -44,6 +44,6 @@
     <div id="graph-container" class="column" ></div>
 </div>
 
-    <script src="{{ url_for('static', filename='home.js') }}"></script>
-    <script  src="{{ url_for('static', filename='network_graph.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script  src="{{ url_for('static', filename='js/network_graph.js') }}"></script>
 {% endblock %}

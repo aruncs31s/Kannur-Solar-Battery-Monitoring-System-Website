@@ -11,7 +11,11 @@ crossorigin=""></script>
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='device.css') }}" />
+<!-- For Datepicker -->
+
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/devices.css') }}" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
 integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
 crossorigin=""/>
@@ -19,6 +23,12 @@ crossorigin=""/>
 {% endblock %} 
 
 {% block content %}
+
+<h1 class="under-construction">Expected to release with v0.0.4</h1>
+
+
+
+
 
 <script>
     var map = L.map('map').setView([51.505, -0.09], 13);

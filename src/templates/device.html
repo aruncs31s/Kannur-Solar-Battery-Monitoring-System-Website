@@ -6,16 +6,27 @@
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
 
+
+
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='device.css') }}" />
+<!-- For Datepciker -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<!-- End Datepicker -->
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/device.css') }}" />
 {% endblock %} 
 {% block content %}
 <div class="dashboard">
   <div class="current-values">
     <div class="row">
       <div class="column-left">
+         
+        <p>Date: <input type="text" id="datepicker"></p>
+ 
         <div id="chart-battery" class="chart-container"></div>
       </div>
       <div class="column-right">
@@ -84,5 +95,18 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='device.js') }}"></script>
+<script src="{{ url_for('static', filename='js/device.js') }}"></script>
+
+<!-- For Datepicker -->
+<script src="{{ url_for('static', filename='js/ui/datepicker.js') }}"></script>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<script>
+$( function() {
+  $( "#datepicker" ).datepicker();
+} );
+</script>
+
+<!-- End Datepicker -->
 {% endblock %}
