@@ -144,7 +144,7 @@ setInterval(function () {
   };
   xhttp.open("GET", "/api/data", true);
   xhttp.send();
-}, 1000);
+}, 15000);
 
 
 
