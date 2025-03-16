@@ -2,7 +2,7 @@
 import csv
 import sqlite3
 from datetime import datetime
-import time
+
 from flask import Flask, jsonify, render_template, request
 
 from database import Database
@@ -220,22 +220,24 @@ def receive_data():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+
 def send_top_data():
-    i = '192.168.1.2'
-    data = db.get_data(i, '2025-02-26')
+    i = "192.168.1.2"
+    data = db.get_data(i, "2025-02-26")
+
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    print('date_requested to /api/data')
+    print("date_requested to /api/data")
     TIME_INDEX = 2
     BAT_INDEX = 3
-    ip = '192.168.1.3'
+    ip = "192.168.1.3"
     raw_data = db.get_data(ip, date=datetime.now().date())
     print(len(raw_data))
     data = [
         {
-            'timestamp': row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),
-            'battery_voltage': row[BAT_INDEX]
+            "timestamp": row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),
+            "battery_voltage": row[BAT_INDEX],
         }
         for row in raw_data
     ]
