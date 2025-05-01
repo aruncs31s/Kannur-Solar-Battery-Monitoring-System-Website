@@ -15,35 +15,39 @@
 
 {% block content %}
 
-    <h2 class="devices">Devices Lists</h2>
- 
-
-
-<div class="row">
-
-
-        <ul id="device-list" >
-            <div class="device_list column">
-                <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Search devices by Place">
-                    <button onclick="searchDevices()" class="search-button" style="margin-left: .3rem;">Search</button>
-                    <button onclick="sortDevices()" style="margin-left: 2rem;">Sort by Status</button>
-                </div>
+<div class="vert_layout">
+    <div class="devices_info">
+        <h1>Device List</h1>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Enter Place">
+            <button onclick="searchDevices()" class="button-54" style="margin-left: .3rem;">Search</button>
+            <button class="button-54" onclick="sortDevices()" style="margin-left: 2rem;">Sort by Status</button>
+        </div>
+        <div class="device-list">
             {% for device in devices %}
-                <li class="{{ 'active-device' if device.status.lower() == 'active' else 'inactive-device' }}">
-                    <div>
+            <li class="{{'active-device' if device.status.lower() == 'active' else 'inactive-device' }}">
+                <div class="device-name">
                         <a href="/device/{{ device.assigned_place }}" class="button-link" onclick="sendDeviceInfo('{{ device.assigned_place }}')"> {{ device.assigned_place }}</a>
-                    </div>
-                    <div>
-                        <span>Status: {{ device.status }} - IP: {{ device.ip }}</span>
-                    </div>
-                </li>
+                </div>
+
+                <button class="button-54">
+                    <span class="status">IP: {{ device.ip }} Last_Voltage: {{ device.voltage }}</span>
+                </button> 
+            </li>
             {% endfor %}
-        </ul>
+        </div>
     </div>
-    <div id="graph-container" class="column" ></div>
+    <div class="news">
+        <h1>NEWS</h1>
+        <div class="center">Reserved Space for news </div>
+    </div>
+
 </div>
 
+
+
+
+    <!-- <div id="graph-container" class="column" ></div> -->
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-    <script  src="{{ url_for('static', filename='js/network_graph.js') }}"></script>
+    <!-- <script  src="{{ url_for('static', filename='js/network_graph.js') }}"></script> -->
 {% endblock %}

@@ -2,9 +2,7 @@ import csv
 import os
 import sqlite3
 from datetime import datetime
-
 debug = 1
-
 # Register the adapter for datetime
 sqlite3.register_adapter(datetime, lambda val: val.isoformat())
 sqlite3.register_converter(
@@ -83,7 +81,7 @@ class Database:
     def insert_data(self, device_id, voltage):
         # iam planning to use the ip as the device id .
         timestamp = datetime.now()
-        print(timestamp)
+        # print(timestamp)
         self.cursor.execute(
             """
         INSERT INTO timeseries_data (device_id, timestamp, voltage)
@@ -105,5 +103,9 @@ class Database:
         )
         rows = self.cursor.fetchall()
         return rows
-        """ implement a function that takes the device id and data{battery voltage } as the params and insert the data into the database"""
-        """also implement a function to retrive data acording to date , month , week etc .. args{device_id , something to specify the date range}"""
+    def get_latest_data(self,device_id):
+        self.cursor.execute('''
+        SELECT * FROM timeseries_data WHERE device_id = ? ORDER BY timestamp DESC LIMIT 1
+        ''', (device_id,))
+        row = self.cursor.fetchone()
+        return row

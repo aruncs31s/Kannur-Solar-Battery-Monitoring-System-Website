@@ -4,31 +4,52 @@ import sqlite3
 from datetime import datetime
 import time
 from flask import Flask, jsonify, render_template, request
-
+import requests
 from database import Database
 from scraper import get_esp_data
-
+import random
 # db = Database()
 app = Flask(__name__)
 ESP8266_IP = "192.168.58.43"
 ESP8266_PORT = 80
-
+# (601, '192.168.1.2', datetime.datetime(2025, 5, 1, 18, 43, 3, 338307), 99.0)
+# id , ip , timetamp , voltage -> 3 index 
+VOLT_INDEX = 3 
 db = Database("the_database.db")
 
-
+def update_random_data():
+    print("Updating random data")
+    with open("devices.csv", newline="") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            ip = row["IP"]
+            round_random_voltage = round(random.uniform(8.7, 12), 2)
+            db.insert_data(ip ,round_random_voltage)
 @app.route("/")
 def home():
     devices = []
     with open("devices.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
+            ip = row["IP"]
+            print(row["IP"])
+            lates_data = db.get_latest_data(ip)
+            voltage = lates_data[VOLT_INDEX]
+            print("Voltage: " , voltage)
+            '''
+            eg {'assigned_place': 'Parassini_Kadavu',
+              'status': 'Active',
+                'ip': '192.168.1.2'}
+            '''
             devices.append(
                 {
                     "assigned_place": row["Assigned_Place"],
                     "status": row["Status"],
                     "ip": row["IP"],
+                    "voltage": voltage,
                 }
             )
+
     # Sort devices by status
     active_devices = [
         device for device in devices if device["status"].lower() == "active"
@@ -37,6 +58,7 @@ def home():
         device for device in devices if device["status"].lower() == "inactive"
     ]
     sorted_devices = active_devices + inactive_devices
+    print(sorted_devices)
     return render_template("home.html", devices=sorted_devices)
 
 
@@ -169,7 +191,7 @@ def devices_page(theDevice):
                     }
                 )
     return render_template(
-        "device.html",
+        "selected_device.html",
         nearby_devices=nearby_devices,
         devices_under_main_node=devices_under_main_node,
         device_name=device_name,
@@ -226,12 +248,13 @@ def send_top_data():
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
+    update_random_data()
     print('date_requested to /api/data')
     TIME_INDEX = 2
     BAT_INDEX = 3
     ip = '192.168.1.3'
     raw_data = db.get_data(ip, date=datetime.now().date())
-    print(len(raw_data))
+    # print(len(raw_data))
     data = [
         {
             'timestamp': row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),
@@ -239,6 +262,7 @@ def get_data():
         }
         for row in raw_data
     ]
+    # print(data)
     return jsonify(data), 200
 
 

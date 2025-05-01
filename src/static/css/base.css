@@ -71,23 +71,24 @@ footer {
   bottom: 0;
 }
 
-nav {
+.navbar {
   background-color: var(--nord1);
   overflow: hidden;
 }
 
-nav ul {
+.navbar ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
 
-nav .nav_links {
+.navbar ul .nav_links {
   display: flex;
   justify-content: space-around;
+  width: 100%;
 }
 
-nav a {
+.navbar a {
   display: block;
   color: white;
   text-align: center;
@@ -95,7 +96,7 @@ nav a {
   text-decoration: none;
 }
 
-nav a:hover {
+.navbar a:hover {
   background-color: #ddd;
   color: black;
 }

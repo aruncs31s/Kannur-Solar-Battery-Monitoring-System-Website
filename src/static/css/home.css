@@ -2,29 +2,18 @@
 @import "base.css";
 
 
-ul {
-  width: 30rem;
-  list-style-type: none;
-  /* padding: 0; */
+.vert_layout{
   display: flex;
-  flex-direction: column;
-    /* position: relative; */
-  top: 0;
-  left: 0;
-  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+  padding-bottom: 10rem;
 }
-
-li {
-  background-color: var(--nord2);
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 44rem;
-  width: 100%;
-  box-sizing: border-box;
+.news .center {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center; 
+  align-items: center;   
+  height: 50vh;          
+  text-align: center;     
 }
 
 button {
@@ -37,19 +26,65 @@ button:hover {
   color: var(--nord6);
 }
 
-.devices {
-  text-align: left;
-  padding-left: 3rem;
+.button-link:hover {
+  background-color: var(--nord9);
 }
 
-.device_list {
+
+ul {
+  list-style-type: none;
   display: flex;
-  flex-direction: column;
-  position: center;
-  padding-bottom: 100px;
+}
+li {
+  background-color: var(--nord2);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 44rem;
+  width: 100%;
+  display: flex;
+}
+.device-name{
+  padding-right: 10rem;
+  color: blue;
 }
 
-/* For Search Function */
+.button-54 {
+  font-family: "Open Sans", sans-serif;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  /* text-transform: uppercase; */
+  color: #000;
+  cursor: pointer;
+  border: 3px solid;
+  padding: 0.25em 0.5em;
+  box-shadow: 1px 1px 0px 0px, 2px 2px 0px 0px, 3px 3px 0px 0px, 4px 4px 0px 0px, 5px 5px 0px 0px;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-54:active {
+  box-shadow: 0px 0px 0px 0px;
+  top: 5px;
+  left: 5px;
+}
+
+@media (min-width: 768px) {
+  .button-54 {
+    padding: 0.25em 0.75em;
+  }
+}
+
+span{
+  width: 200px; /* Set a fixed width */
+  height: 50px; /* Set a fixed height */
+}
+
+
+
 .search-bar {
   display: flex;
   justify-content: center;
@@ -61,18 +96,10 @@ button:hover {
   display: inline-block;
   padding: 10px 20px;
   font-size: 16px;
-  color: white;
+  color: var(--nord6);
   background-color: var(--nord8);
-  border: none;
-  border-radius: 5px;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
+  min-width: 9rem;
   transition: background-color 0.3s ease;
-}
-
-.button-link:hover {
-  background-color: var(--nord9);
 }
 
 .active-device {
@@ -80,23 +107,8 @@ button:hover {
   background-color: var(--nord3);
   color: white;
 }
-
 .inactive-device {
   border: 2px solid var(--nord3);
   background-color: var(--nord9);
   color: white;
-}
-
-.row {
-top: 0;
-left:0;
-  /* display: flex; */
-  flex-direction: column;
-  margin-left: 2rem;
-}
-
-main .column {
-  margin: auto;
-  display: flex;
-  /* flex-direction: column; */
 }

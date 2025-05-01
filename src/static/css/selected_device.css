@@ -1,16 +1,46 @@
 @import './base.css';
 
-header {
-    background-color: var(--nord1);
-    color: var(--nord6);
-    padding: 20px 0;
+
+/* 
+__
+__
+__
+
+*/
+.horizontal_layout{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
     text-align: center;
-    font-size: 24px;
+    /* padding-bottom: 10rem; */
+}
+
+/* 
+| | |
+*/
+.vert_layout{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    text-align: center;
+    padding-bottom: 10rem;
+    margin: 15px;
+    padding: 20px;
+    background-color: var(--nord1);
+    border-radius: 5px;
+    height: 50vh;
 }
 
 
-.dashboard {
-    text-align: center;
+.chart-container{
+    min-width: 75%;
+    margin: 0 auto;
+
+}
+.device-control {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
 }
 
 .current-values {
@@ -47,28 +77,28 @@ header {
 
 
 
-main .device-status {
+/* main .device-status {
     margin: 20px;
     padding: 20px;
     background-color: var(--nord1);
     border-radius: 5px;
-}
-
+} */
+/* 
 main .row {
     display: flex;
     flex-direction: row;
     margin-left: 2rem;
     align-items: stretch;
 
-}
-
+} */
+/* 
 main .column-right {
     margin: auto;
     display: flex;
     flex-direction: column;
-}
+} */
 
-.related-devices{
+/* .related-devices{
     background-color: var(--nord1);
     display: flex;
     flex-direction: row;
@@ -77,15 +107,15 @@ main .column-right {
     margin: 20px;
     border-radius: 10px;
     margin-bottom: 100px;
-}
+} */
 
-.nearby-devices{
+/* .nearby-devices{
     background-color: var(--nord1);
     display: flex;
     flex-direction: column;
     justify-content: space-around;
 
-}
+} */
     /* flex-direction: column; */
     /* /* justify-content: space-around; */
     /* padding-bottom: 100px; */
@@ -101,35 +131,19 @@ main .column-right {
     /* border-radius: 10px; */
     /* margin-bottom: 100px; */
 
-.device-list li{
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 10px;
-    max-width: 600px;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
- } 
-
-
-.device-list span a:hover{
-    background-color: var(--nord3);
-    color: var(--nord6);
-}
-
-#graph-container{
+ 
+/* #graph-container{
 width: 33rem;
 height: 20rem;
 margin: 0 auto;
 
-}
-.device-under-main-node{
+} */
+/* .device-under-main-node{
     background-color: var(--nord1);
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-}
+} */
 
 /* Bouncing Box Styles */
 .bouncing-box {
