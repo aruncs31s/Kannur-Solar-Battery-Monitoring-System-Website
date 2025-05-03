@@ -10,16 +10,16 @@ document.addEventListener("DOMContentLoaded", function () {
         "Battery Voltage"
       ),
     };
-
     let initialChartData = [];
-
     function updateDashboard() {
       fetch("/api/data")
-        .then((response) => response.json())
+        .then((response) =>{
+          console.log("Response from /api/data:", response);
+          return response.json();
+        })
         .then((data) => {
           if (data.length > 0) {
             const latest = data[data.length - 1];
-
             // Check if battery_voltage exists
             if (latest.hasOwnProperty("battery_voltage")) {
               const batteryElement = document.getElementById("battery");

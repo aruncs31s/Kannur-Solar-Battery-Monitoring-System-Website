@@ -253,8 +253,9 @@ def get_data():
     TIME_INDEX = 2
     BAT_INDEX = 3
     ip = '192.168.1.3'
-    raw_data = db.get_data(ip, date=datetime.now().date())
-    # print(len(raw_data))
+    # raw_data = db.get_data(ip, date=datetime.datetime.now().strftime("%Y-%m-%d"))
+    raw_data = db.get_data(ip,date=datetime.today().date()) 
+    print("Raw Data length: " , len(raw_data))
     data = [
         {
             'timestamp': row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),

@@ -4,17 +4,7 @@
 {% block extra_js %}
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // Ensure Highcharts initialization happens after DOM is loaded
-    if (document.getElementById("chart-battery")) {
-      console.log("Chart container found. Initializing Highcharts...");
-      updateDashboard(); // Ensure this function initializes the chart
-    } else {
-      console.error("Chart container not found!");
-    }
-  });
-</script>
+  
 {% endblock %}
 
 {% block extra_css %}
