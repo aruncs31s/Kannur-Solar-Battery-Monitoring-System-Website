@@ -8,47 +8,45 @@ import requests
 from database import Database
 from scraper import get_esp_data
 import random
+from esp import ESP_DEVICES
+
 # db = Database()
+
 app = Flask(__name__)
-ESP8266_IP = "192.168.58.43"
 ESP8266_PORT = 80
+CSV_FILE = "devices.csv"
+
+esp_devices = ESP_DEVICES(CSV_FILE)
+
+VOLT_INDEX = 3 
+TIME_INDEX = 2 
+
+
 # (601, '192.168.1.2', datetime.datetime(2025, 5, 1, 18, 43, 3, 338307), 99.0)
 # id , ip , timetamp , voltage -> 3 index 
-VOLT_INDEX = 3 
 db = Database("the_database.db")
 
-def update_random_data():
-    print("Updating random data")
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            ip = row["IP"]
-            round_random_voltage = round(random.uniform(8.7, 12), 2)
-            db.insert_data(ip ,round_random_voltage)
+
 @app.route("/")
 def home():
+    devices_details = esp_devices.get_esp_details()
     devices = []
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            ip = row["IP"]
-            print(row["IP"])
-            lates_data = db.get_latest_data(ip)
-            voltage = lates_data[VOLT_INDEX]
-            print("Voltage: " , voltage)
-            '''
-            eg {'assigned_place': 'Parassini_Kadavu',
-              'status': 'Active',
-                'ip': '192.168.1.2'}
-            '''
-            devices.append(
-                {
-                    "assigned_place": row["Assigned_Place"],
-                    "status": row["Status"],
-                    "ip": row["IP"],
-                    "voltage": voltage,
-                }
-            )
+    for row in devices_details:
+        lates_data = db.get_latest_data(row["ip"])
+        voltage = lates_data[VOLT_INDEX]
+        print("Voltage: " , voltage)
+        '''
+        eg {'assigned_place': 'Parassini_Kadavu',
+            'status': 'Active',
+            'ip': '192.168.1.2'}
+        '''
+        device = {
+            "assigned_place": row["assigned_place"],
+            "status": row["status"],
+            "ip": row["ip"],
+            "voltage": voltage,
+        }
+        devices.append(device)  
 
     # Sort devices by status
     active_devices = [
@@ -248,7 +246,7 @@ def send_top_data():
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    update_random_data()
+    db.update_random_data()
     print('date_requested to /api/data')
     TIME_INDEX = 2
     BAT_INDEX = 3

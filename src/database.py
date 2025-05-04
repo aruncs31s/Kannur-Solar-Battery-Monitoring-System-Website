@@ -2,6 +2,7 @@ import csv
 import os
 import sqlite3
 from datetime import datetime
+import random
 debug = 1
 # Register the adapter for datetime
 sqlite3.register_adapter(datetime, lambda val: val.isoformat())
@@ -12,8 +13,8 @@ sqlite3.register_converter(
 
 class Database:
     # Creates a database container
-    def __init__(self, databse_name):
-        self.conn = sqlite3.connect(databse_name, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
+    def __init__(self, db_file):
+        self.conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
         self.cursor = self.conn.cursor()
         #  This function should be only called ones
         self.cursor.execute(
@@ -109,3 +110,10 @@ class Database:
         ''', (device_id,))
         row = self.cursor.fetchone()
         return row
+    def update_random_data(self,ip_list):
+        self.ip_list = ip_list
+        print("Updating random data")
+        for ip in self.ip_list:
+            print(f"Updating random data for {ip}")
+            round_random_voltage = round(random.uniform(8.7, 12), 2)
+            self.db.insert_data(ip ,round_random_voltage)

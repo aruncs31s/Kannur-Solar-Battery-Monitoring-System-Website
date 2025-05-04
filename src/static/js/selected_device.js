@@ -1,4 +1,7 @@
+
 document.addEventListener("DOMContentLoaded", function () {
+  const current_node = document.getElementById("current-node") 
+  console.log(current_node)
   // Ensure the DOM is fully loaded before initializing charts
   if (document.getElementById("chart-battery")) {
     console.log("Initializing charts...");
