@@ -4,6 +4,12 @@ import sqlite3
 from datetime import datetime
 import random
 debug = 1
+CSV_IP_INDEX = 0
+CSV_PLACE_INDEX = 1
+CSV_STATUS_INDEX = 2
+CSV_MAIN_NODE_INDEX = 3
+CSV_NEARBY_NODES_INDEX = 4
+
 # Register the adapter for datetime
 sqlite3.register_adapter(datetime, lambda val: val.isoformat())
 sqlite3.register_converter(
@@ -15,8 +21,11 @@ class Database:
     # Creates a database container
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
+        self.ip_list = []
         self.cursor = self.conn.cursor()
         #  This function should be only called ones
+        self.create_tables()
+    def create_tables(self):
         self.cursor.execute(
             """
                         CREATE TABLE IF NOT EXISTS device_info (
@@ -40,7 +49,7 @@ class Database:
                     )
                     """
         )
-
+        self.conn.commit()
     # this function is used to insert a device into the list
     def insert_device(self, ip_address, assigned_place, main_node):
         self.cursor.execute(
@@ -50,23 +59,25 @@ class Database:
         """,
             (ip_address, assigned_place, main_node),
         )
-        self.conn.commit()
 
     # this function takes the csv file and adds to the database only if the device is not previously exist
     def upate_device_list(self, csv_file_name):
         with open(csv_file_name, "r") as file:
             reader = csv.reader(file)
             for row in reader:
-                print(row)
-                if self.device_exists(row[0]):
-                    if debug:
-                        print(f"ip: {row[0]} is already exists")
-                else:
-                    self.insert_device(row[0], row[1], row[4])
-                    if debug:
-                        print(f"ip: {row[0]} , place: {row[1]} , main_node {row[4]}")
-                    print(f"Device Name: {row[0]}")
 
+                print(row)
+                if self.device_exists(row[CSV_IP_INDEX]):
+                    if debug:
+                        print(f"ip: {row[CSV_IP_INDEX]} is already exists")
+                else:
+                    self.ip_list.append(row[CSV_IP_INDEX])
+                    self.insert_device(row[CSV_IP_INDEX], row[CSV_PLACE_INDEX], row[CSV_MAIN_NODE_INDEX])
+                    if debug:
+                        print(f"ip: {row[CSV_IP_INDEX]} , place: {row[CSV_PLACE_INDEX]} , main_node {row[CSV_MAIN_NODE_INDEX]}")
+                    print(f"Device Name: {row[CSV_IP_INDEX]}")
+        self.conn.commit()
+    
     # helper function for update_device_list
     def device_exists(self, ip_address):
         self.cursor.execute(
@@ -83,37 +94,41 @@ class Database:
         # iam planning to use the ip as the device id .
         timestamp = datetime.now()
         # print(timestamp)
-        self.cursor.execute(
-            """
-        INSERT INTO timeseries_data (device_id, timestamp, voltage)
-        VALUES (?, ?, ?)
+        self.cursor.execute("""
+            INSERT INTO timeseries_data (device_id, timestamp, voltage)
+            VALUES (?, ?, ?)
         """,
             (device_id, timestamp, voltage),
         )
-
-        self.conn.commit()
+        
 
     # device id ? 1 try using the ip as the device id??
     def get_data(self, device_id, date):
-        data = {}
+        _data = {}
         self.cursor.execute(
             """
-        SELECT * FROM timeseries_data WHERE device_id = ? AND timestamp >= date(?)
+            SELECT * FROM timeseries_data 
+            WHERE device_id = ? AND timestamp >= date(?) ORDER BY timestamp DESC
+            LIMIT 1000 
         """,
             (device_id, date),
         )
-        rows = self.cursor.fetchall()
-        return rows
+        _data = self.cursor.fetchall()
+        return _data
     def get_latest_data(self,device_id):
         self.cursor.execute('''
         SELECT * FROM timeseries_data WHERE device_id = ? ORDER BY timestamp DESC LIMIT 1
         ''', (device_id,))
         row = self.cursor.fetchone()
         return row
-    def update_random_data(self,ip_list):
-        self.ip_list = ip_list
+    def update_random_data(self):
         print("Updating random data")
         for ip in self.ip_list:
             print(f"Updating random data for {ip}")
             round_random_voltage = round(random.uniform(8.7, 12), 2)
-            self.db.insert_data(ip ,round_random_voltage)
+            self.insert_data(ip ,round_random_voltage)
+        self.conn.commit()
+    def close(self):
+        if self.conn:
+            self.conn.close()
+            print("Database connection closed by Database.close()") # Optional confirmation message

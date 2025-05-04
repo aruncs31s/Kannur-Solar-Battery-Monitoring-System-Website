@@ -1,7 +1,10 @@
 
 document.addEventListener("DOMContentLoaded", function () {
-  const current_node = document.getElementById("current-node") 
-  console.log(current_node)
+  const current_node = document
+  .getElementById("current-node")
+  .innerHTML.split(":")
+  .map((part) => part.trim())[1];
+  console.log("Curret node : " + current_node);
   // Ensure the DOM is fully loaded before initializing charts
   if (document.getElementById("chart-battery")) {
     console.log("Initializing charts...");
@@ -15,9 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     let initialChartData = [];
     function updateDashboard() {
-      fetch("/api/data")
+      fetch("/api/data?device_id="+current_node)
         .then((response) =>{
           console.log("Response from /api/data:", response);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
           return response.json();
         })
         .then((data) => {

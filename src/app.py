@@ -10,25 +10,47 @@ from scraper import get_esp_data
 import random
 from esp import ESP_DEVICES
 
-# db = Database()
+debug = 1
+CSV_FILE = "devices.csv"
+DB_FILE = "the_database.db"
 
 app = Flask(__name__)
+
 ESP8266_PORT = 80
-CSV_FILE = "devices.csv"
+
+
 
 esp_devices = ESP_DEVICES(CSV_FILE)
-
-VOLT_INDEX = 3 
-TIME_INDEX = 2 
-
+esp_ips = esp_devices.get_esp_ip()
 
 # (601, '192.168.1.2', datetime.datetime(2025, 5, 1, 18, 43, 3, 338307), 99.0)
 # id , ip , timetamp , voltage -> 3 index 
-db = Database("the_database.db")
+
+CSV_IP_INDEX = 0
+CSV_PLACE_INDEX = 1
+CSV_STATUS_INDEX = 2
+CSV_MAIN_NODE_INDEX = 3
+CSV_NEARBY_NODES_INDEX = 4
+
+VOLT_INDEX = 3 
+TIME_INDEX = 2 
+BAT_INDEX = 3
+
+# timestamp format for highcharts
+highcharts_timestamp_format = "%Y-%m-%d %H:%M:%S"
+
+db = Database(DB_FILE)
 
 
 @app.route("/")
 def home():
+    """
+    { 
+        "assigned_place": row["Assigned_Place"],
+        "status": row["Status"],
+        "ip": row["IP"],    
+    }
+    """
     devices_details = esp_devices.get_esp_details()
     devices = []
     for row in devices_details:
@@ -47,7 +69,6 @@ def home():
             "voltage": voltage,
         }
         devices.append(device)  
-
     # Sort devices by status
     active_devices = [
         device for device in devices if device["status"].lower() == "active"
@@ -135,66 +156,66 @@ def get_near_nodes(device):
 @app.route("/device/<theDevice>", methods=["GET"])
 def devices_page(theDevice):
     device_name = theDevice
-    total_devices = []
-    nearby_devices = []
-    devices_under_main_node = []
-    main_node = ""
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["Assigned_Place"] == device_name:
-                main_node = row["Main_Node"]
-                break
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["Nearby_Nodes"] == device_name:
-                nearby_devices.append(
-                    {
-                        "assigned_place": row["Assigned_Place"],
-                        "status": row["Status"],
-                        "ip": row["IP"],
-                        "main_node": row["Main_Node"],
-                        "nearby_nodes": row["Nearby_Nodes"],
-                    }
-                )
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["Main_Node"] == main_node:
-                devices_under_main_node.append(
-                    {
-                        "assigned_place": row["Assigned_Place"],
-                        "status": row["Status"],
-                        "ip": row["IP"],
-                        "main_node": row["Main_Node"],
-                        "nearby_nodes": row["Nearby_Nodes"],
-                    }
-                )
+    # total_devices = []
+    # nearby_devices = []
+    # devices_under_main_node = []
+    # main_node = ""
+    # with open("devices.csv", newline="") as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for row in reader:
+    #         if row["Assigned_Place"] == device_name:
+    #             main_node = row["Main_Node"]
+    #             break
+    # with open("devices.csv", newline="") as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for row in reader:
+    #         if row["Nearby_Nodes"] == device_name:
+    #             nearby_devices.append(
+    #                 {
+    #                     "assigned_place": row["Assigned_Place"],
+    #                     "status": row["Status"],
+    #                     "ip": row["IP"],
+    #                     "main_node": row["Main_Node"],
+    #                     "nearby_nodes": row["Nearby_Nodes"],
+    #                 }
+    #             )
+    # with open("devices.csv", newline="") as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for row in reader:
+    #         if row["Main_Node"] == main_node:
+    #             devices_under_main_node.append(
+    #                 {
+    #                     "assigned_place": row["Assigned_Place"],
+    #                     "status": row["Status"],
+    #                     "ip": row["IP"],
+    #                     "main_node": row["Main_Node"],
+    #                     "nearby_nodes": row["Nearby_Nodes"],
+    #                 }
+    #             )
 
-    total_devices = nearby_devices + devices_under_main_node
-    current_device = []
-    # Check if this is absolutely necessary
-    with open("devices.csv", newline="") as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            if row["Assigned_Place"] == theDevice:
-                current_device.append(
-                    {
-                        "assigned_place": row["Assigned_Place"],
-                        "status": row["Status"],
-                        "ip": row["IP"],
-                        "main_node": row["Main_Node"],
-                        "nearby_nodes": row["Nearby_Nodes"],
-                    }
-                )
+    # total_devices = nearby_devices + devices_under_main_node
+    # current_device = []
+    # # Check if this is absolutely necessary
+    # with open("devices.csv", newline="") as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for row in reader:
+    #         if row["Assigned_Place"] == theDevice:
+    #             current_device.append(
+    #                 {
+    #                     "assigned_place": row["Assigned_Place"],
+    #                     "status": row["Status"],
+    #                     "ip": row["IP"],
+    #                     "main_node": row["Main_Node"],
+    #                     "nearby_nodes": row["Nearby_Nodes"],
+    #                 }
+    #             )
     return render_template(
         "selected_device.html",
-        nearby_devices=nearby_devices,
-        devices_under_main_node=devices_under_main_node,
+        # nearby_devices=nearby_devices,
+        # devices_under_main_node=devices_under_main_node,
         device_name=device_name,
-        total_devices=total_devices,
-        current_device=current_device,
+        # total_devices=total_devices,
+        # current_device=current_device,
     )
 
 
@@ -226,7 +247,7 @@ def control_esp():
 @app.route("/api/data", methods=["POST"])
 def receive_data():
     try:
-        data = get_esp_data()
+        data = get_esp_data(esp_ips)
         print(data)
         conn = sqlite3.connect("sensor_data.db")
         c = conn.cursor()
@@ -246,46 +267,36 @@ def send_top_data():
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
+    if(debug):
+        print('date_requested to /api/data (GET)')
     db.update_random_data()
-    print('date_requested to /api/data')
-    TIME_INDEX = 2
-    BAT_INDEX = 3
-    ip = '192.168.1.3'
-    # raw_data = db.get_data(ip, date=datetime.datetime.now().strftime("%Y-%m-%d"))
-    raw_data = db.get_data(ip,date=datetime.today().date()) 
-    print("Raw Data length: " , len(raw_data))
+    # Get the current node from the request
+    current_node = request.args.get("device_id")
+    # check if the current node is provided in the request
+    if current_node is None:
+        return jsonify({"status": "error", "message": "Device ID is required"}), 400
+    if(debug):
+        print("Current node is " , current_node)
+    # Get the IP address of the current node
+    current_node_ip = esp_devices.get_ip_of_the_node(current_node)
+    if current_node_ip is None:
+        return jsonify({"status": "error", "message": "Device not found"}), 404
+    if(debug):
+        print("Current node ip is " , current_node_ip)
+    # get the current date format = 2025-05-05
+    date_now = datetime.today().date()
+    raw_data = db.get_data(current_node_ip,date=date_now) 
+    if(debug):
+        print("Raw Data length: " , len(raw_data))
     data = [
         {
-            'timestamp': row[TIME_INDEX].strftime("%Y-%m-%d %H:%M:%S"),
+            'timestamp': row[TIME_INDEX].strftime(highcharts_timestamp_format),
             'battery_voltage': row[BAT_INDEX]
         }
         for row in raw_data
     ]
     # print(data)
     return jsonify(data), 200
-
-
-# def get_data():
-#     try:
-#         timeframe = request.args.get('timeframe', 'hour')
-#         conn = sqlite3.connect('sensor_data.db')
-#         c = conn.cursor()
-#         if timeframe == 'hour':
-#             time_constraint = "datetime('now', '-1 hour')"
-#         elif timeframe == 'day':
-# time_constraint = "datetime('appnow', '-1 day')"
-#         elif timeframe == 'week':
-#             time_constraint = "datetime('now', '-7 days')"
-#         else:
-#             time_constraint = "datetime('now', '-1 hour')"
-#         c.execute(f'''SELECT * FROM sensor_readings WHERE timestamp > {time_constraint} ORDER BY timestamp DESC''')
-#         rows = c.fetchall()
-#         conn.close()
-
-#         data = [{'id': row[0], 'battery_voltage': row[1], 'timestamp': row[2]} for row in rows]
-#         return jsonify(data), 200
-#     except Exception as e:
-#         return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @app.route("/device-click", methods=["POST"])
@@ -389,4 +400,20 @@ def search_devices():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    try:
+        update_device_list = db.upate_device_list(CSV_FILE)
+        if debug:
+            print("Device list updated successfully.")
+        app.run(host="0.0.0.0", port=5000, debug=True)
+    except KeyboardInterrupt:
+        db.close()
+        print("Server stopped by user.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print("Server Restarting in 10 seconds...")
+        time.sleep(10)
+        app.run(host="0.0.0", port=5000, debug=True)
+    finally:
+        print("Server stopped.")
+        db.close()
+        print("Database connection closed.")

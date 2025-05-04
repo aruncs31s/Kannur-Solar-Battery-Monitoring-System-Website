@@ -96,8 +96,8 @@ span{
   display: inline-block;
   padding: 10px 20px;
   font-size: 16px;
-  color: var(--nord6);
-  background-color: var(--nord8);
+  /* color: var(--nord6); */
+  /* background-color: var(--nord8); */
   min-width: 9rem;
   transition: background-color 0.3s ease;
 }
