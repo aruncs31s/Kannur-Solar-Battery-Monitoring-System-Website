@@ -85,6 +85,12 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/readings/")
+def readings():
+    return render_template("devices.html")
+@app.route("/contacts")
+def contacts():
+    return render_template("devices.html")
 @app.route("/devices")
 def devices():
     return render_template("devices.html")
