@@ -265,6 +265,22 @@ def send_top_data():
     i = '192.168.1.2'
     data = db.get_data(i, '2025-02-26')
 
+
+@app.route("/api/data/old", methods=["GET"])
+def get_old_data():
+    day = request.args.get("day")
+    if day is None:
+        return jsonify({"status": "error", "message": "Day is required"}), 400
+    current_node = request.args.get("device_id")
+    if current_node is None:
+        return jsonify({"status": "error", "message": "Device ID is required"}), 400
+    current_node_ip = esp_devices.get_ip_of_the_node(current_node)
+    if current_node_ip is None:
+        return jsonify({"status": "error", "message": "Device not found"}), 404
+    the_date = datetime.strptime(day, "%Y-%m-%d").date() - datetime.timedelta(days=day)
+    # raw_data = db.get_data(current_node_ip,date=the_date)
+
+
 @app.route("/api/data", methods=["GET"])
 def get_data():
     if(debug):

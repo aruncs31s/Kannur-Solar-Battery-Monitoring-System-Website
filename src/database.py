@@ -128,6 +128,39 @@ class Database:
             round_random_voltage = round(random.uniform(8.7, 12), 2)
             self.insert_data(ip ,round_random_voltage)
         self.conn.commit()
+    # def get_30_min_interval_data(self,device_id):
+    #     self.cursor.execute('''
+    #     SELECT * FROM timeseries_data 
+    #     WHERE device_id = ? AND strftime('%M', timestamp) IN ('00', '30')
+    #     ''', (device_id,))
+    #     rows = self.cursor.fetchall()
+    #     result = []
+    #     for row in rows:
+    #         result.append({
+    #             'timestamp': row[2],
+    #             'voltage': row[3]
+    #         })
+    #     return result
+    def get_30_min_interval_data(self, device_id, date):
+        _data = {}
+        # Select data points where the minute is '00' or '30'
+        # Order by the most recent timestamp and limit to 24 results
+        self.cursor.execute(
+            """
+            SELECT * FROM timeseries_data 
+            WHERE device_id = ? 
+              AND timestamp >= date(?) 
+              AND strftime('%M', timestamp) IN ('00', '30') 
+            ORDER BY timestamp DESC
+            LIMIT 24 
+        """,
+            (device_id, date),
+        )
+        _data = self.cursor.fetchall()
+        # To get the oldest 24 first if needed, you can reverse the list in Python:
+        # _data.reverse() 
+        return _data
+    
     def close(self):
         if self.conn:
             self.conn.close()
