@@ -279,7 +279,7 @@ def get_old_data():
         return jsonify({"status": "error", "message": "Device not found"}), 404
     the_date = datetime.strptime(day, "%Y-%m-%d").date() - datetime.timedelta(days=day)
     # raw_data = db.get_data(current_node_ip,date=the_date)
-
+    return data
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
