@@ -17,7 +17,7 @@
 {% block content %}
 
 <div class="horizontal_layout">
-  <div class="vert_layout">
+  <div class="vert_layout single-style">
     <div id="chart-battery" class="chart-container"></div>
     <div class="device-control">
       <h3 id="current-node"> Device: {{ device_name }}</h3>
@@ -35,17 +35,31 @@
 
 <div class="older_readings horizontal_layout">
   <h1>Older Readings</h2>
-    <div class="vert_layout">
-      <div id="chart-battery_prev_1" class="chart-container_new"></div>
-      <div id="chart-battery_prev_2" class="chart-container_new"></div>
+
+
+    <div class="vert_layout card-layout">
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_1" class="chart-container-new"></div>
+      </div>
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_2" class="chart-container-new"></div>
+      </div>
     </div>
-    <div class="vert_layout">
-      <div id="chart-battery_prev_3" class="chart-container_new"></div>
-      <div id="chart-battery_prev_4" class="chart-container_new"></div>
+    <div class="vert_layout card-layout">
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_3" class="chart-container-new"></div>
+      </div>
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_4" class="chart-container-new"></div>
+      </div>
     </div>
-    <div class="vert_layout">
-      <div id="chart-battery_prev_5" class="chart-container_new"></div>
-      <div id="chart-battery_prev_6" class="chart-container_new"></div>
+    <div class="vert_layout card-layout">
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_5" class="chart-container-new"></div>
+      </div>
+      <div class="card-chart-container">
+        <div id="chart-battery_prev_6" class="chart-container-new"></div>
+      </div>
     </div>
 </div>
 

@@ -25,8 +25,8 @@ class ESP_DEVICES:
         def get_ip_of_the_node(self,current_node):
             for device in self.all_details:
                 if device["assigned_place"] == current_node:
+                    print("inside get_ip_of_the_node")
                     return device["ip"]
-                
             return None
 if __name__ == "__main__":
     esp_devices = ESP_DEVICES("devices.csv")

@@ -1,13 +1,12 @@
 # app.py
 import csv
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 from flask import Flask, jsonify, render_template, request
 import requests
 from database import Database
 from scraper import get_esp_data
-import random
 from esp import ESP_DEVICES
 
 debug = 1
@@ -277,9 +276,20 @@ def get_old_data():
     current_node_ip = esp_devices.get_ip_of_the_node(current_node)
     if current_node_ip is None:
         return jsonify({"status": "error", "message": "Device not found"}), 404
-    the_date = datetime.strptime(day, "%Y-%m-%d").date() - datetime.timedelta(days=day)
+    the_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     # raw_data = db.get_data(current_node_ip,date=the_date)
-    return data
+    raw_data = db.get_10_min_interval_data(device_id=current_node_ip,date=the_date)
+    if(debug):
+        print("Raw Data length: " , len(raw_data))
+    data = [
+        {
+            'timestamp': row[TIME_INDEX].strftime(highcharts_timestamp_format),
+            'battery_voltage': row[BAT_INDEX]
+        }
+        for row in raw_data
+    ]
+    # print(data)
+    return jsonify(data), 200
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
@@ -417,7 +427,7 @@ def search_devices():
 
 if __name__ == "__main__":
     try:
-        update_device_list = db.upate_device_list(CSV_FILE)
+        update_device_list = db.update_device_list(CSV_FILE)
         if debug:
             print("Device list updated successfully.")
         app.run(host="0.0.0.0", port=5000, debug=True)
