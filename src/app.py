@@ -252,9 +252,12 @@ def control_esp():
 @app.route("/api/data", methods=["POST"])
 def receive_data():
     try:
-        data = get_esp_data(esp_ips)
-        print(data)
-        conn = sqlite3.connect("sensor_data.db")
+        for ip in esp_ips:
+            esp_data = get_esp_data(ip)
+            if debug:
+                print(esp_data)
+
+            conn = sqlite3.connect("sensor_data.db")
         c = conn.cursor()
         c.execute(
             """INSERT INTO sensor_readings (battery_voltage) VALUES (?)""",
@@ -297,6 +300,21 @@ def get_old_data():
     # print(data)
     return jsonify(data), 200
 
+
+# TODO: Check if this works and only use the previous method only when the page fist loads 
+@app.route("/api/data/live" , methods=["GET"])
+def get_live_data():
+    current_node = request.args.get("device_id")
+    current_node_ip = esp_devices.get_ip_of_the_node(current_node)
+    live_data = get_esp_data(current_node_ip)
+    data = [
+        {
+            'timestamp': datetime.today().strftime(highcharts_timestamp_format),
+            'battery_voltage': live_data["battery_voltage"],
+        }
+    ]
+    return jsonify(data), 200
+
 @app.route("/api/data", methods=["GET"])
 def get_data():
     if(debug):
@@ -329,6 +347,8 @@ def get_data():
     ]
     # print(data)
     return jsonify(data), 200
+
+
 
 
 @app.route("/device-click", methods=["POST"])

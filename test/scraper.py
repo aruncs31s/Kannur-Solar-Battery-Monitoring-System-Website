@@ -30,26 +30,25 @@ current_date = datetime.now().strftime("%Y-%m-%d")
 
 def get_esp_data(esp_url):
     try:
-        # the endpoint must be /data otherwise the link will return the server page instead of the json data
-        http_esp_url = "http://" + esp_url + "/data"
         esp_response = requests.get(esp_url)
         data_json = esp_response.json()
-        # TODO: Make it as object with {} ✅ 
-        data = {
+        # TODO: Make it as object with {}
+        data = [
+            
+            data_json["battery_voltage"],
+            data_json["led_relayState"],
+        ]
+        data_2 = {
             "battery_voltage": data_json["battery_voltage"],
-            "led_relayState": data_json["led_relayState"],
+            "led_relayState": data_json["led_relayState"]
         }
-        return data
+        return data_2
     except Exception as e:
         print(f"An error occurred: {e}")
-        _retry_count = 5
+        time.sleep(5)
+        get_esp_data(esp_url)
 
-        # check if the loop will exit if the return is executed. 
-        for i in range(_retry_count + 1 ):
-            get_esp_data(esp_url)
-            time.sleep(1)
 
 if __name__ == "__main__":
-    # for test
     esp_url = "http://192.168.58.43/data"
     print(get_esp_data())
