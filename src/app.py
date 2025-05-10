@@ -77,8 +77,13 @@ def home():
     devices = []
     for row in devices_details:
         device_ip = row["ip"]
+
         latest_data = db.get_latest_data(device_ip)
-        voltage = latest_data[VOLT_INDEX]
+        if latest_data: 
+            voltage = latest_data[VOLT_INDEX]
+        else:
+            print(f"Latest data for {device_ip} not found.")
+            voltage = None
         print("Voltage: ", voltage)
         """
         eg {'assigned_place': 'Parassini_Kadavu',
@@ -466,7 +471,7 @@ if __name__ == "__main__":
         update_device_list = db.update_device_list(CSV_FILE)
         if debug:
             print("Device list updated successfully.")
-        app.run(host="0.0.0.0", port=8000, debug=True)
+        app.run(host="0.0.0.0", port=5000, debug=True)
     except KeyboardInterrupt:
         db.close()
         print("Server stopped by user.")
@@ -474,7 +479,7 @@ if __name__ == "__main__":
         print(f"An error occurred: {e}")
         print("Server Restarting in 10 seconds...")
         time.sleep(10)
-        app.run(host="0.0.0", port=8000, debug=True)
+        app.run(host="0.0.0", port=5000, debug=True)
     finally:
         print("Server stopped.")
         db.close()
