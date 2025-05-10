@@ -26,7 +26,7 @@
           Toggle Control
         </button>
         <p class="button-status" id="buttonStatus">Status: Inactive</p>
-        <p>Battery: <span id="battery">--</span>V</p>
+        <p>Battery: <span id="current-battery-value">--</span>V</p>
         <p>LED State: <span id="ledState">--</span></p>
         <!-- <form action="todo">
           <input type="text" placeholder="when to turn on " class="pad2m border2"> 
@@ -147,6 +147,7 @@
 <!-- </div> -->
 <!-- </div> -->
 <!-- </div> -->
+<script src="{{ url_for('static', filename='js/chart_def.js') }}"></script>
 
 <script src="{{ url_for('static', filename='js/selected_device.js') }}"></script>
 

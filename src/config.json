@@ -1,0 +1,18 @@
+{
+    "esp": {
+        "port": 80,
+        "current_model": "esp8266",
+        "test_ip": "192.168.1.1"
+    },
+    "database": {
+        "file": "the_database.db"
+    },
+    "csv": {
+        "file": "devices.csv"
+    },
+    "debug": true,
+    "timestamp_format": "%Y-%m-%d %H:%M:%S",
+    "highcharts":{
+        "timestamp_format":"%Y-%m-%d %H:%M:%S"
+    }
+}

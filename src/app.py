@@ -1,73 +1,97 @@
-# app.py
-import csv
-import sqlite3
-from datetime import datetime, timedelta
-import time
-from flask import Flask, jsonify, render_template, request
-import requests
-from database import Database
-from scraper import get_esp_data
-from esp import ESP_DEVICES
+"""
+Author: Arun CS
+Repo: https://github.com/aruncs31s/Kannur-Solar-Battery-Monitoring-System-Website
+main_repo: https://github.com/aruncs31s/Kannur-Solar-Battery-Monitoring-System
+"""
 
-debug = 1
-CSV_FILE = "devices.csv"
-DB_FILE = "the_database.db"
+import csv
+
+# Imports
+import json
+import sqlite3
+import time
+from datetime import datetime, timedelta
+
+import requests
+from flask import Flask, jsonify, render_template, request
+
+from database import Database
+from esp import ESP_DEVICES
+from scraper import get_esp_data
+
+# read the configuration file
+config_file = "config.json"
+try:
+    with open(config_file) as f:
+        config = json.load(f)
+except FileNotFoundError:
+    print("Configuration file not found.")
+    config_file = "src/config.json"
+    with open(config_file) as f:
+        config = json.load(f)
+
+test = True
+debug = config.get("debug", 1)
+CSV_FILE = config["csv"]["file"]
+DB_FILE = config["database"]["file"]
+ESP8266_PORT = str(config["esp"]["port"])
+ESP8266_IP = config["esp"]["test_ip"]
+
 
 app = Flask(__name__)
 
-ESP8266_PORT = 80
 
-
-
+# get details and ip of the esp devices
 esp_devices = ESP_DEVICES(CSV_FILE)
 esp_ips = esp_devices.get_esp_ip()
-
-# (601, '192.168.1.2', datetime.datetime(2025, 5, 1, 18, 43, 3, 338307), 99.0)
-# id , ip , timetamp , voltage -> 3 index 
 
 CSV_IP_INDEX = 0
 CSV_PLACE_INDEX = 1
 CSV_STATUS_INDEX = 2
 CSV_MAIN_NODE_INDEX = 3
 CSV_NEARBY_NODES_INDEX = 4
-
-VOLT_INDEX = 3 
-TIME_INDEX = 2 
+VOLT_INDEX = 3
+TIME_INDEX = 2
 BAT_INDEX = 3
 
-# timestamp format for highcharts
-highcharts_timestamp_format = "%Y-%m-%d %H:%M:%S"
 
-db = Database(DB_FILE)
+# timestamp format for highcharts
+highcharts_timestamp_format = config["highcharts"]["timestamp_format"]
+
+
+db = Database(DB_FILE, esp_ips)
 
 
 @app.route("/")
 def home():
+    # Example format
     """
-    { 
+    {
         "assigned_place": row["Assigned_Place"],
         "status": row["Status"],
-        "ip": row["IP"],    
+        "ip": row["IP"],
     }
     """
+
     devices_details = esp_devices.get_esp_details()
     devices = []
     for row in devices_details:
-        lates_data = db.get_latest_data(row["ip"])
-        voltage = lates_data[VOLT_INDEX]
-        print("Voltage: " , voltage)
-        '''
+        device_ip = row["ip"]
+        latest_data = db.get_latest_data(device_ip)
+        voltage = latest_data[VOLT_INDEX]
+        print("Voltage: ", voltage)
+        """
         eg {'assigned_place': 'Parassini_Kadavu',
             'status': 'Active',
             'ip': '192.168.1.2'}
-        '''
-        device = {
+        """
+        device_details_json = {
             "assigned_place": row["assigned_place"],
             "status": row["status"],
             "ip": row["ip"],
             "voltage": voltage,
         }
-        devices.append(device)  
+        devices.append(device_details_json)
     # Sort devices by status
     active_devices = [
         device for device in devices if device["status"].lower() == "active"
@@ -80,6 +104,11 @@ def home():
     return render_template("home.html", devices=sorted_devices)
 
 
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template("404.html"), 404
+
+
 @app.route("/about/")
 def about():
     return render_template("about.html")
@@ -88,9 +117,13 @@ def about():
 @app.route("/readings/")
 def readings():
     return render_template("devices.html")
+
+
 @app.route("/contacts")
 def contacts():
     return render_template("devices.html")
+
+
 @app.route("/devices")
 def devices():
     return render_template("devices.html")
@@ -249,51 +282,29 @@ def control_esp():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route("/api/data", methods=["POST"])
-def receive_data():
-    try:
-        for ip in esp_ips:
-            esp_data = get_esp_data(ip)
-            if debug:
-                print(esp_data)
-
-            conn = sqlite3.connect("sensor_data.db")
-        c = conn.cursor()
-        c.execute(
-            """INSERT INTO sensor_readings (battery_voltage) VALUES (?)""",
-            (data.get("battery_voltage"),),
-        )
-        conn.commit()
-        conn.close()
-        return jsonify({"status": "success"}), 200
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-def send_top_data():
-    i = '192.168.1.2'
-    data = db.get_data(i, '2025-02-26')
-
-
 @app.route("/api/data/old", methods=["GET"])
 def get_old_data():
-    day = request.args.get("day")
+    if test:
+        db.update_random_data()
+    current_node, day = (request.args.get("device_id"), request.args.get("day"))
     if day is None:
         return jsonify({"status": "error", "message": "Day is required"}), 400
-    current_node = request.args.get("device_id")
     if current_node is None:
         return jsonify({"status": "error", "message": "Device ID is required"}), 400
+    if debug:
+        print(f"current_node: {current_node}, day: {day}")
     current_node_ip = esp_devices.get_ip_of_the_node(current_node)
     if current_node_ip is None:
         return jsonify({"status": "error", "message": "Device not found"}), 404
-    the_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    the_date = (datetime.now() - timedelta(days=int(day))).strftime("%Y-%m-%d")
     # raw_data = db.get_data(current_node_ip,date=the_date)
-    raw_data = db.get_10_min_interval_data(device_id=current_node_ip,date=the_date)
-    if(debug):
-        print("Raw Data length: " , len(raw_data))
+    raw_data = db.get_10_min_interval_data(device_id=current_node_ip, date=the_date)
+    if debug:
+        print("Raw Data length: ", len(raw_data))
     data = [
         {
-            'timestamp': row[TIME_INDEX].strftime(highcharts_timestamp_format),
-            'battery_voltage': row[BAT_INDEX]
+            "timestamp": row[TIME_INDEX].strftime(highcharts_timestamp_format),
+            "battery_voltage": row[BAT_INDEX],
         }
         for row in raw_data
     ]
@@ -301,54 +312,53 @@ def get_old_data():
     return jsonify(data), 200
 
 
-# TODO: Check if this works and only use the previous method only when the page fist loads 
-@app.route("/api/data/live" , methods=["GET"])
+# TODO: Check if this works and only use the previous method only when the page fist loads
+@app.route("/api/data/live", methods=["GET"])
 def get_live_data():
     current_node = request.args.get("device_id")
     current_node_ip = esp_devices.get_ip_of_the_node(current_node)
     live_data = get_esp_data(current_node_ip)
     data = [
         {
-            'timestamp': datetime.today().strftime(highcharts_timestamp_format),
-            'battery_voltage': live_data["battery_voltage"],
+            "timestamp": datetime.today().strftime(highcharts_timestamp_format),
+            "battery_voltage": live_data["battery_voltage"],
         }
     ]
     return jsonify(data), 200
 
+
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    if(debug):
-        print('date_requested to /api/data (GET)')
+    if debug:
+        print("date_requested to /api/data (GET)")
     db.update_random_data()
     # Get the current node from the request
     current_node = request.args.get("device_id")
     # check if the current node is provided in the request
     if current_node is None:
         return jsonify({"status": "error", "message": "Device ID is required"}), 400
-    if(debug):
-        print("Current node is " , current_node)
+    if debug:
+        print("Current node is ", current_node)
     # Get the IP address of the current node
     current_node_ip = esp_devices.get_ip_of_the_node(current_node)
     if current_node_ip is None:
         return jsonify({"status": "error", "message": "Device not found"}), 404
-    if(debug):
-        print("Current node ip is " , current_node_ip)
+    if debug:
+        print("Current node ip is ", current_node_ip)
     # get the current date format = 2025-05-05
     date_now = datetime.today().date()
-    raw_data = db.get_data(current_node_ip,date=date_now) 
-    if(debug):
-        print("Raw Data length: " , len(raw_data))
+    raw_data = db.get_data(current_node_ip, date=date_now)
+    if debug:
+        print("Raw Data length: ", len(raw_data))
     data = [
         {
-            'timestamp': row[TIME_INDEX].strftime(highcharts_timestamp_format),
-            'battery_voltage': row[BAT_INDEX]
+            "timestamp": row[TIME_INDEX].strftime(highcharts_timestamp_format),
+            "battery_voltage": row[BAT_INDEX],
         }
         for row in raw_data
     ]
     # print(data)
     return jsonify(data), 200
-
-
 
 
 @app.route("/device-click", methods=["POST"])
@@ -456,7 +466,7 @@ if __name__ == "__main__":
         update_device_list = db.update_device_list(CSV_FILE)
         if debug:
             print("Device list updated successfully.")
-        app.run(host="0.0.0.0", port=5000, debug=True)
+        app.run(host="0.0.0.0", port=8000, debug=True)
     except KeyboardInterrupt:
         db.close()
         print("Server stopped by user.")
@@ -464,7 +474,7 @@ if __name__ == "__main__":
         print(f"An error occurred: {e}")
         print("Server Restarting in 10 seconds...")
         time.sleep(10)
-        app.run(host="0.0.0", port=5000, debug=True)
+        app.run(host="0.0.0", port=8000, debug=True)
     finally:
         print("Server stopped.")
         db.close()

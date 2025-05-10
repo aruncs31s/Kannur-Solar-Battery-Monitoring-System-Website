@@ -1,8 +1,9 @@
 import csv
 import os
-import sqlite3
-from datetime import datetime
 import random
+import sqlite3
+from datetime import datetime, timedelta
+
 debug = 1
 CSV_IP_INDEX = 0
 CSV_PLACE_INDEX = 1
@@ -19,11 +20,14 @@ sqlite3.register_converter(
 
 class Database:
     # Creates a database container
-    def __init__(self, db_file):
-        self.conn = sqlite3.connect(db_file, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False)
-        self.ip_list = []
+    def __init__(self, db_file, ip_list):
+        self.conn = sqlite3.connect(
+            db_file, detect_types=sqlite3.PARSE_DECLTYPES, check_same_thread=False
+        )
+        self.ip_list = ip_list
         #  This function should be only called ones
         self.create_tables()
+
     def create_tables(self):
         cursor = self.conn.cursor()
         try:
@@ -53,6 +57,7 @@ class Database:
             self.conn.commit()
         finally:
             cursor.close()
+
     # this function is used to insert a device into the list
     def insert_device(self, ip_address, assigned_place, main_node):
         cursor = self.conn.cursor()
@@ -78,13 +83,18 @@ class Database:
                     if debug:
                         print(f"ip: {row[CSV_IP_INDEX]} is already exists")
                 else:
-                    self.ip_list.append(row[CSV_IP_INDEX])
-                    self.insert_device(row[CSV_IP_INDEX], row[CSV_PLACE_INDEX], row[CSV_MAIN_NODE_INDEX])
+                    self.insert_device(
+                        row[CSV_IP_INDEX],
+                        row[CSV_PLACE_INDEX],
+                        row[CSV_MAIN_NODE_INDEX],
+                    )
                     if debug:
-                        print(f"ip: {row[CSV_IP_INDEX]} , place: {row[CSV_PLACE_INDEX]} , main_node {row[CSV_MAIN_NODE_INDEX]}")
+                        print(
+                            f"ip: {row[CSV_IP_INDEX]} , place: {row[CSV_PLACE_INDEX]} , main_node {row[CSV_MAIN_NODE_INDEX]}"
+                        )
                     print(f"Device Name: {row[CSV_IP_INDEX]}")
         self.conn.commit()
-    
+
     # helper function for update_device_list
     def device_exists(self, ip_address):
         cursor = self.conn.cursor()
@@ -100,36 +110,53 @@ class Database:
         finally:
             cursor.close()
         return count > 0
-        
 
-    # Function to insert timeseries data
-    def insert_data(self, device_id, voltage):
+    def insert_old_data(self, device_id, voltage, time_delta):
         # iam planning to use the ip as the device id .
-        timestamp = datetime.now()
+        time_delta = timedelta(days=time_delta)
+        timestamp = datetime.now() - timedelta(days=1)
         cursor = self.conn.cursor()
         try:
-            self.cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO timeseries_data (device_id, timestamp, voltage)
                 VALUES (?, ?, ?)
             """,
-            (device_id, timestamp, voltage),
+                (device_id, timestamp, voltage),
             )
             self.conn.commit()
         finally:
             cursor.close()
 
-        
+    # Function to insert timeseries data
+
+    def insert_data(self, device_id, voltage):
+        # iam planning to use the ip as the device id .
+        timestamp = datetime.now()
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute(
+                """
+                INSERT INTO timeseries_data (device_id, timestamp, voltage)
+                VALUES (?, ?, ?)
+            """,
+                (device_id, timestamp, voltage),
+            )
+            self.conn.commit()
+        finally:
+            cursor.close()
 
     # device id ? 1 try using the ip as the device id??
     def get_data(self, device_id, date):
         _data = {}
         cursor = self.conn.cursor()
-        try: 
+        try:
             cursor.execute(
                 """
                 SELECT * FROM timeseries_data 
-                WHERE device_id = ? AND timestamp >= date(?) ORDER BY timestamp DESC
-                LIMIT 1000 
+                WHERE device_id = ? AND timestamp >= date(?) 
+                ORDER BY timestamp DESC
+                LIMIT 100
                 """,
                 (device_id, date),
             )
@@ -137,26 +164,42 @@ class Database:
         finally:
             cursor.close()
         return _data
-    
-    def get_latest_data(self,device_id):
+
+    def get_latest_data(self, device_id):
         cursor = self.conn.cursor()
         try:
-            cursor.execute('''
+            cursor.execute(
+                """
                 SELECT * FROM timeseries_data
                 WHERE device_id = ? 
                 ORDER BY timestamp DESC 
                 LIMIT 1
-                ''', (device_id,))
+                """,
+                (device_id,),
+            )
             row = cursor.fetchone()
             return row
         finally:
             cursor.close()
-    def update_random_data(self):
+
+    def update_random_data(self, previous=False):
+
         print("Updating random data")
-        for ip in self.ip_list:
-            print(f"Updating random data for {ip}")
-            round_random_voltage = round(random.uniform(8.7, 12), 2)
-            self.insert_data(ip ,round_random_voltage)
+        if previous:
+            for day in range(1, 7):
+                for ip in self.ip_list:
+                    if debug:
+                        print(f"Updating random data for {ip} , day = {day}")
+                    round_random_voltage = round(random.uniform(8.7, 12), 2)
+                    self.insert_old_data(ip, round_random_voltage, time_delta=day)
+                    self.insert_data(ip, round_random_voltage)
+        else:
+            for ip in self.ip_list:
+                if debug:
+                    print(f"Updating random data for {ip}")
+                    round_random_voltage = round(random.uniform(8.7, 12), 2)
+                    self.insert_data(ip, round_random_voltage)
+
         self.conn.commit()
 
     def get_10_min_interval_data(self, device_id, date):
@@ -180,9 +223,11 @@ class Database:
         finally:
             cursor.close()
         return _data
-    
+
     def close(self):
         if self.conn:
             self.conn.close()
             self.conn = None
-            print("Database connection closed by Database.close()") # Optional confirmation message
+            print(
+                "Database connection closed by Database.close()"
+            )  # Optional confirmation message
