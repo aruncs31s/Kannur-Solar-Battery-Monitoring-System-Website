@@ -27,37 +27,37 @@ class Database:
         self.ip_list = ip_list
         #  This function should be only called ones
         self.create_tables()
-
+        
     def create_tables(self):
         cursor = self.conn.cursor()
         try:
             cursor.execute(
                 """
-                            CREATE TABLE IF NOT EXISTS device_info (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                ip_address TEXT NOT NULL,
-                                assigned_place TEXT NOT NULL,
-                                main_node TEXT NOT NULL,
-                                created_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-                            )
-                            """
+                CREATE TABLE IF NOT EXISTS device_info (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    ip_address TEXT NOT NULL,
+                    assigned_place TEXT NOT NULL,
+                    main_node TEXT NOT NULL,
+                    created_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+                """
             )
             # Create the timeseries_data table
             cursor.execute(
                 """
-                        CREATE TABLE IF NOT EXISTS timeseries_data (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            device_id TEXT NOT NULL,
-                            timestamp DATETIME NOT NULL,
-                            voltage REAL NOT NULL,
-                            FOREIGN KEY (device_id) REFERENCES device_info (ip_address)
-                        )
-                        """
+                CREATE TABLE IF NOT EXISTS timeseries_data (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    device_id TEXT NOT NULL,
+                    timestamp DATETIME NOT NULL,
+                    voltage REAL NOT NULL,
+                    FOREIGN KEY (device_id) REFERENCES device_info (ip_address)
+                )
+                """
             )
             self.conn.commit()
         finally:
             cursor.close()
-
+            
     # this function is used to insert a device into the list
     def insert_device(self, ip_address, assigned_place, main_node):
         cursor = self.conn.cursor()
@@ -155,14 +155,14 @@ class Database:
                 """
                 SELECT * FROM timeseries_data 
                 WHERE device_id = ? AND timestamp >= date(?) 
-                ORDER BY timestamp DESC
-                LIMIT 100
+                ORDER BY timestamp ASC
                 """,
                 (device_id, date),
             )
             _data = cursor.fetchall()
         finally:
             cursor.close()
+        # return _data[::-1]
         return _data
 
     def get_latest_data(self, device_id):
@@ -215,14 +215,15 @@ class Database:
                 AND timestamp >= date(?) 
                 AND strftime('%M', timestamp) IN ('00', '10','20','30','40','50') 
                 ORDER BY timestamp DESC
-                LIMIT 144
                 """,
                 (device_id, date),
             )
+                # LIMIT 144 
+            
             _data = cursor.fetchall()
         finally:
             cursor.close()
-        return _data
+        return _data[::-1]
 
     def close(self):
         if self.conn:

@@ -2,7 +2,7 @@
 
 {% block title %} Device - {{ device_name }} {% endblock %}
 {% block extra_js %}
-<script src="https://code.highcharts.com/highcharts.js"></script>
+<!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
 <script src="https://code.highcharts.com/modules/networkgraph.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
   
@@ -10,7 +10,7 @@
 
 {% block extra_css %}
 <!-- For Datepciker -->
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css"> -->
 <!-- End Datepicker -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/selected_device.css') }}" />
 {% endblock %}
@@ -113,7 +113,6 @@
 <!-- href="/device/{{ device.assigned_place }}" -->
 <!-- onclick="sendDeviceInfo('{{ device.name }}')" -->
 <!-- class="button-link"  -->
->
 <!-- {{ device.assigned_place }} -->
 <!-- </a> -->
 <!-- <div> -->
@@ -155,8 +154,8 @@
 <!-- For Datepicker -->
 <!-- <script src="{{ url_for('static', filename='js/ui/datepicker.js') }}"></script> -->
 
-<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.1.js"></script> -->
+<!-- <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script> -->
 <!-- <script>
   $(function () {
     $("#datepicker").datepicker();

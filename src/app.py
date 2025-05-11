@@ -4,17 +4,16 @@ Repo: https://github.com/aruncs31s/Kannur-Solar-Battery-Monitoring-System-Websit
 main_repo: https://github.com/aruncs31s/Kannur-Solar-Battery-Monitoring-System
 """
 
-import csv
-
 # Imports
+import csv
 import json
 import sqlite3
 import time
 from datetime import datetime, timedelta
-
 import requests
 from flask import Flask, jsonify, render_template, request
 
+# custom libs 
 from database import Database
 from esp import ESP_DEVICES
 from scraper import get_esp_data
@@ -28,22 +27,28 @@ except FileNotFoundError:
     print("Configuration file not found.")
     config_file = "src/config.json"
     with open(config_file) as f:
+        print(f"Configuration file found in ${config_file}")
         config = json.load(f)
 
 test = True
+
+# Disable the debug mode in production
+
 debug = config.get("debug", 1)
+# Path of the CSV File 
 CSV_FILE = config["csv"]["file"]
+# Path of the Database file.
 DB_FILE = config["database"]["file"]
+# ESP8266 Port and IP for testing only
 ESP8266_PORT = str(config["esp"]["port"])
 ESP8266_IP = config["esp"]["test_ip"]
 
 
-app = Flask(__name__)
 
 
 # get details and ip of the esp devices
-esp_devices = ESP_DEVICES(CSV_FILE)
-esp_ips = esp_devices.get_esp_ip()
+esp_devices = ESP_DEVICES(CSV_FILE) # class 
+esp_ips = esp_devices.get_esp_ip() # list
 
 CSV_IP_INDEX = 0
 CSV_PLACE_INDEX = 1
@@ -58,8 +63,11 @@ BAT_INDEX = 3
 # timestamp format for highcharts
 highcharts_timestamp_format = config["highcharts"]["timestamp_format"]
 
-
 db = Database(DB_FILE, esp_ips)
+
+
+app = Flask(__name__)
+
 
 
 @app.route("/")
@@ -315,6 +323,7 @@ def get_old_data():
     ]
     # print(data)
     return jsonify(data), 200
+    # return jsonify({'abc':1 , 'bcd': 2 }) ,200 
 
 
 # TODO: Check if this works and only use the previous method only when the page fist loads
